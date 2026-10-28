@@ -5,3 +5,5 @@ Members:
 - Tyler Birkbeck
 - Li Tan
 - Mustafa Abeidi
+
+We will be using SQLite to handle the data storage
