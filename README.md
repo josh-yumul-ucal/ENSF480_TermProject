@@ -22,4 +22,6 @@ Three User Roles/Abilities (subject to change):
     - Manage routes and aircraft
     - Update schedules
 
-Need to create an overarching schedule that controls when flights happen ()
+- Need to create an overarching schedule that controls when flights happen ()
+
+- Simulate payments? 
