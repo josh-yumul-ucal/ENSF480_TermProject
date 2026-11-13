@@ -1,11 +1,12 @@
-Github Repo for ENSF 480 Term Project
+# Github Repo for ENSF 480 Term Project
 
-Members: 
+## Members: 
 - Josh Yumul
 - Tyler Birkbeck
 - Li Tan
 - Mustafa Abeidi
 
+## General information
 We will be using SQLite to handle the data storage
 
 Three User Roles/Abilities (subject to change):
@@ -25,3 +26,16 @@ Three User Roles/Abilities (subject to change):
 - Need to create an overarching schedule that controls when flights happen ()
 
 - Simulate payments? 
+
+# Classes
+## Boundary Classes: one for each actor/use-case pair
+<u>Customer</u>
+- bookFlight -> addCustomerToManifest
+- viewAllFlights -> [method that queries the database and returns all future flights, maybe filter by flights that start closest to customer]
+- viewCustomerFlights -> [method that queries database and returns all flights that contains the customer's unique ID]
+- searchFlights -> [create a generalized method that can query the database and returns the ones with the tags the customer requests] (probably a facade pattern to obfuscate we add a bunch of subsystems for the search bar)
+
+Note: Use an interface to define the flight viewer classes probably
+
+<u>System Admin</u>
+- manageAircrafts == add/remove aircrafts from airport hangar table
