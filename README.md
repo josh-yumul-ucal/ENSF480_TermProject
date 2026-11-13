@@ -39,3 +39,25 @@ Note: Use an interface to define the flight viewer classes probably
 
 <u>System Admin</u>
 - manageAircrafts == add/remove aircrafts from airport hangar table
+
+
+# How to run:
+Check that Maven and Java 17 or later is installed on your machine, the proceeding terminal commands should return information on your Maven and JDK installations. 
+```powershell
+mvn --version
+java --version
+javac --version
+```
+
+Compile and run the project.
+```powershell
+mvn compile
+mvn exec:java
+```
+
+Alternatively, compile and run in the same line
+```powershell
+mvn compile exec:java
+```
+
+I'm not sure if this is how it works on MacOS (sorry Tyler)

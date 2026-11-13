@@ -1,21 +1,25 @@
-// ENSURE WORKING DIRECTORY IS "flightreservationsystem"
-// TODO: change the file indexing so the program isn't dependent on the working directory to find data/ folder
-
 package flightResSys;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
-public class Main {
-    public static void main(String[] args) throws SQLException{
+public class FlightDatabase {
       // throws SQLException lets program show JDBC errors
 
 
       // String holds directory for database
-      String url = "jdbc:sqlite:data/flights.db";
+      private static String url = "jdbc:sqlite:data/flights.db";
+      private static String testDBURL = "jdbc:sqlite:data/flights.db";
 
       // Connection = java interface that represents an active db connection
       // DriverManager.getConnection(url) finds JDBC driver that can open the url (will create if no file there)
-      try(Connection conn = DriverManager.getConnection(url)){
+
+      public static void testDB(){
+      try(Connection conn = DriverManager.getConnection(testDBURL)){
+
 
         // JDBC interface that lets you send SQL commands
         // stmt is connected to conn object, which is connected to our practice db
@@ -29,6 +33,8 @@ public class Main {
             passenger TEXT
           )
           """);
+
+        stmt.executeUpdate("DELETE from Flights");
 
         stmt.executeUpdate("""
           INSERT INTO Flights(destination, passenger)
@@ -56,3 +62,4 @@ public class Main {
     }
   }
 }
+
