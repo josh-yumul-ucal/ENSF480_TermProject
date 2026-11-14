@@ -40,6 +40,8 @@ Note: Use an interface to define the flight viewer classes probably
 <u>System Admin</u>
 - manageAircrafts == add/remove aircrafts from airport hangar table
 
+Probably use a Singleton pattern for each flight
+
 
 # How to run:
 Check that Maven and Java 17 or later is installed on your machine, the proceeding terminal commands should return information on your Maven and JDK installations. 
