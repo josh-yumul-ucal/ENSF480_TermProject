@@ -1,16 +1,10 @@
 package flightResSys;
 
-import java.sql.*;
-import javax.swing.*;
-import java.awt.*;
-import java.nio.file.Files;
+import javafx.application.Application;
 
 public class Main {
     public static void main(String[] args){
-      SwingUtilities.invokeLater(() -> {
-        FlightGUI gui = new FlightGUI();
-        gui.setVisible(true);
-      });
+      Application.launch(FlightGUI.class, args);
     }
 }
   //     // throws SQLException lets program show JDBC errors
