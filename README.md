@@ -53,13 +53,13 @@ javac --version
 
 Compile and run the project.
 ```powershell
-mvn compile
-mvn exec:java
+mvn clean compile
+mvn javafx:run
 ```
 
 Alternatively, compile and run in the same line
 ```powershell
-mvn compile exec:java
+mvn compile javafx:run
 ```
 
 I'm not sure if this is how it works on MacOS (sorry Tyler)

@@ -1,34 +1,34 @@
 package flightResSys;
 
-import javax.swing.*;
-import java.awt.*;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
+import javafx.stage.Stage;
 
-public class FlightGUI extends JFrame{
-  public FlightGUI(){
-    setTitle("Flight Reservation System GUI test");
-    setSize(800, 800);
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    setLocationRelativeTo(null);
+public class FlightGUI extends Application {
+  @Override
+  public void start(Stage stage) {
+    stage.setTitle("Flight Reservation System GUI test");
 
-    setLayout(new FlowLayout());
-
-    // Adds new JButton objects
-    JButton searchButton = new JButton("Search Flights");
-    JButton sqlTestButton = new JButton("Test SQL database");
-    JLabel statusLabel = new JLabel("Welcome!");
+    Button searchButton = new Button("Search Flights");
+    Button sqlTestButton = new Button("Test SQL database");
+    Label statusLabel = new Label("Welcome!");
 
     // e == ActionEvent == user action, which is passed as a parameter into a lambda expression to perform the button's functions
-    searchButton.addActionListener(e -> {
+    searchButton.setOnAction(e -> {
       statusLabel.setText("The button worked :D");
     });
 
-    sqlTestButton.addActionListener(e -> {
+    sqlTestButton.setOnAction(e -> {
       FlightDatabase.testDB();
       statusLabel.setText("SQL Test executed");
     });
 
-    add (searchButton);
-    add (statusLabel);
-    add (sqlTestButton);
+    FlowPane root = new FlowPane(5, 5, searchButton, statusLabel, sqlTestButton);
+    stage.setScene(new Scene(root, 800, 800));
+    stage.show();
+    stage.centerOnScreen();
   }
 }
