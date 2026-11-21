@@ -35,7 +35,6 @@ public class FlightManagementPanel extends VBox {
     private TextField destinationField;
     private TextField departureDateField; // Using text field for date input
     private TextField arrivalDateField; // Using text field for date input
-    private TextField airlineField;
     private TextField totalSeatsField;
     private TextField priceField;
     private ComboBox<Aircraft> aircraftComboBox; // Dropdown for aircraft selection
@@ -79,9 +78,6 @@ public class FlightManagementPanel extends VBox {
         arrivalDateField = new TextField();
         arrivalDateField.setPromptText("Arrival Date (YYYY-MM-DD HH:MM)");
 
-        airlineField = new TextField();
-        airlineField.setPromptText("Airline");
-
         totalSeatsField = new TextField();
         totalSeatsField.setPromptText("Total Seats");
 
@@ -117,8 +113,8 @@ public class FlightManagementPanel extends VBox {
         TableColumn<Flight, Date> arrivalColumn = new TableColumn<>("Arrival Time");
         arrivalColumn.setCellValueFactory(cellData -> cellData.getValue().arrivalTimeProperty());
 
-        TableColumn<Flight, String> airlineColumn = new TableColumn<>("Airline");
-        airlineColumn.setCellValueFactory(cellData -> cellData.getValue().airlineProperty());
+        TableColumn<Flight, Integer> aircraftIdColumn = new TableColumn<>("Aircraft ID");
+        aircraftIdColumn.setCellValueFactory(cellData -> cellData.getValue().aircraftIdProperty().asObject());
 
         TableColumn<Flight, Integer> totalSeatsColumn = new TableColumn<>("Total Seats");
         totalSeatsColumn.setCellValueFactory(cellData -> cellData.getValue().totalSeatsProperty().asObject());
@@ -127,7 +123,7 @@ public class FlightManagementPanel extends VBox {
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
 
         flightTable.getColumns().addAll(numberColumn, originColumn, destinationColumn,
-                departureColumn, arrivalColumn, airlineColumn,
+                departureColumn, arrivalColumn, aircraftIdColumn,
                 totalSeatsColumn, priceColumn);
         flightTable.setItems(flightData);
     }
@@ -161,17 +157,14 @@ public class FlightManagementPanel extends VBox {
         inputPanel.add(new Label("Arrival Date (YYYY-MM-DD HH:MM):"), 0, 4);
         inputPanel.add(arrivalDateField, 1, 4);
 
-        inputPanel.add(new Label("Airline:"), 0, 5);
-        inputPanel.add(airlineField, 1, 5);
+        inputPanel.add(new Label("Total Seats:"), 0, 5);
+        inputPanel.add(totalSeatsField, 1, 5);
 
-        inputPanel.add(new Label("Total Seats:"), 0, 6);
-        inputPanel.add(totalSeatsField, 1, 6);
+        inputPanel.add(new Label("Price:"), 0, 6);
+        inputPanel.add(priceField, 1, 6);
 
-        inputPanel.add(new Label("Price:"), 0, 7);
-        inputPanel.add(priceField, 1, 7);
-
-        inputPanel.add(new Label("Aircraft:"), 0, 8);
-        inputPanel.add(aircraftComboBox, 1, 8); // Aircraft dropdown
+        inputPanel.add(new Label("Aircraft:"), 0, 7);
+        inputPanel.add(aircraftComboBox, 1, 7); // Aircraft dropdown
 
         HBox buttonBox = new HBox(10);
         buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton);
@@ -298,13 +291,12 @@ public class FlightManagementPanel extends VBox {
         String destination = destinationField.getText().trim();
         String departureDateStr = departureDateField.getText().trim();
         String arrivalDateStr = arrivalDateField.getText().trim();
-        String airline = airlineField.getText().trim();
         String totalSeatsStr = totalSeatsField.getText().trim();
         String priceStr = priceField.getText().trim();
         Aircraft selectedAircraft = aircraftComboBox.getValue();
 
         if (flightNumber.isEmpty() || origin.isEmpty() || destination.isEmpty() ||
-                departureDateStr.isEmpty() || arrivalDateStr.isEmpty() || airline.isEmpty() ||
+                departureDateStr.isEmpty() || arrivalDateStr.isEmpty() ||
                 totalSeatsStr.isEmpty() || priceStr.isEmpty()) {
             showAlert("Error", "Please fill in all required fields");
             return null;
@@ -324,12 +316,12 @@ public class FlightManagementPanel extends VBox {
             flight.setDestination(destination);
             flight.setDepartureTime(departureDate);
             flight.setArrivalTime(arrivalDate);
-            flight.setAirline(airline);
             flight.setTotalSeats(totalSeats);
             flight.setPrice(price);
 
             // Set aircraft if selected
             if (selectedAircraft != null) {
+                flight.setAircraftId(selectedAircraft.getAircraftId());
                 flight.setAircraft(selectedAircraft);
             }
 
@@ -351,13 +343,32 @@ public class FlightManagementPanel extends VBox {
         destinationField.setText(flight.getDestination());
         departureDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(flight.getDepartureTime()));
         arrivalDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(flight.getArrivalTime()));
-        airlineField.setText(flight.getAirline());
         totalSeatsField.setText(String.valueOf(flight.getTotalSeats()));
         priceField.setText(String.valueOf(flight.getPrice()));
 
         // Set aircraft in dropdown if exists
         if (flight.getAircraft() != null) {
-            aircraftComboBox.setValue(flight.getAircraft());
+            // Find the matching aircraft in the combo box and select it
+            Aircraft selectedAircraft = flight.getAircraft();
+            for (Aircraft aircraft : aircraftComboBox.getItems()) {
+                if (aircraft.getAircraftId() == selectedAircraft.getAircraftId()) {
+                    aircraftComboBox.setValue(aircraft);
+                    break;
+                }
+            }
+        } else {
+            // If we have just the aircraft ID but not the full object, try to find it
+            int aircraftId = flight.getAircraftId();
+            if (aircraftId > 0) {
+                for (Aircraft aircraft : aircraftComboBox.getItems()) {
+                    if (aircraft.getAircraftId() == aircraftId) {
+                        aircraftComboBox.setValue(aircraft);
+                        break;
+                    }
+                }
+            } else {
+                aircraftComboBox.setValue(null);
+            }
         }
     }
 
@@ -371,10 +382,9 @@ public class FlightManagementPanel extends VBox {
         destinationField.clear();
         departureDateField.clear();
         arrivalDateField.clear();
-        airlineField.clear();
         totalSeatsField.clear();
         priceField.clear();
-        aircraftComboBox.setValue(null);
+        aircraftComboBox.setPromptText("Select Aircraft");
     }
 
     /**

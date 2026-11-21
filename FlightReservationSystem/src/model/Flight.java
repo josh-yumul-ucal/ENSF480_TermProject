@@ -24,7 +24,7 @@ public class Flight {
     private final StringProperty destination;
     private final ObjectProperty<Date> departureTime;
     private final ObjectProperty<Date> arrivalTime;
-    private final StringProperty airline;
+    private final IntegerProperty aircraftId;
     private final IntegerProperty totalSeats;
     private final IntegerProperty availableSeats;
     private final DoubleProperty price;
@@ -42,7 +42,7 @@ public class Flight {
         this.destination = new SimpleStringProperty();
         this.departureTime = new SimpleObjectProperty<>();
         this.arrivalTime = new SimpleObjectProperty<>();
-        this.airline = new SimpleStringProperty();
+        this.aircraftId = new SimpleIntegerProperty();
         this.totalSeats = new SimpleIntegerProperty();
         this.availableSeats = new SimpleIntegerProperty();
         this.price = new SimpleDoubleProperty();
@@ -57,13 +57,13 @@ public class Flight {
      * @param destination The arrival airport code or city name
      * @param departureTime The departure date and time
      * @param arrivalTime The arrival date and time
-     * @param airline The airline operating the flight
+     * @param aircraftId The aircraft ID assigned to this flight
      * @param totalSeats The total number of seats available
      * @param availableSeats The number of seats available for booking
      * @param price The base fare for a seat on this flight
      */
     public Flight(int flightId, String flightNumber, String origin, String destination,
-                  Date departureTime, Date arrivalTime, String airline, int totalSeats,
+                  Date departureTime, Date arrivalTime, int aircraftId, int totalSeats,
                   int availableSeats, double price) {
         this.flightId = new SimpleIntegerProperty(flightId);
         this.flightNumber = new SimpleStringProperty(flightNumber);
@@ -71,7 +71,7 @@ public class Flight {
         this.destination = new SimpleStringProperty(destination);
         this.departureTime = new SimpleObjectProperty<>(departureTime);
         this.arrivalTime = new SimpleObjectProperty<>(arrivalTime);
-        this.airline = new SimpleStringProperty(airline);
+        this.aircraftId = new SimpleIntegerProperty(aircraftId);
         this.totalSeats = new SimpleIntegerProperty(totalSeats);
         this.availableSeats = new SimpleIntegerProperty(availableSeats);
         this.price = new SimpleDoubleProperty(price);
@@ -187,22 +187,22 @@ public class Flight {
     public ObjectProperty<Date> arrivalTimeProperty() { return arrivalTime; }
 
     /**
-     * Gets the airline name who is operating the flight.
-     * @return The airline name
+     * Gets the aircraft ID assigned to this flight.
+     * @return The aircraft ID
      */
-    public String getAirline() { return airline.get(); }
+    public int getAircraftId() { return aircraftId.get(); }
 
     /**
-     * Sets the airline that is operating the flight.
-     * @param airline The new airline name
+     * Sets the aircraft ID assigned to this flight.
+     * @param aircraftId The new aircraft ID
      */
-    public void setAirline(String airline) { this.airline.set(airline); }
+    public void setAircraftId(int aircraftId) { this.aircraftId.set(aircraftId); }
 
     /**
-     * Gets JavaFX property for airline.
-     * @return The airline property
+     * Gets JavaFX property for aircraft ID.
+     * @return The aircraft ID property
      */
-    public StringProperty airlineProperty() { return airline; }
+    public IntegerProperty aircraftIdProperty() { return aircraftId; }
 
     /**
      * Gets the total number of seats available.

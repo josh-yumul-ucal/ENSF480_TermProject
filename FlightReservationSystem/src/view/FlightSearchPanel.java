@@ -84,8 +84,8 @@ public class FlightSearchPanel extends VBox {
         TableColumn<Flight, Date> arrivalColumn = new TableColumn<>("Arrival Time");
         arrivalColumn.setCellValueFactory(cellData -> cellData.getValue().arrivalTimeProperty());
 
-        TableColumn<Flight, String> airlineColumn = new TableColumn<>("Airline");
-        airlineColumn.setCellValueFactory(cellData -> cellData.getValue().airlineProperty());
+        TableColumn<Flight, Integer> aircraftIdColumn = new TableColumn<>("Aircraft ID");
+        aircraftIdColumn.setCellValueFactory(cellData -> cellData.getValue().aircraftIdProperty().asObject());
 
         TableColumn<Flight, Integer> totalSeatsColumn = new TableColumn<>("Total Seats");
         totalSeatsColumn.setCellValueFactory(cellData -> cellData.getValue().totalSeatsProperty().asObject());
@@ -97,7 +97,7 @@ public class FlightSearchPanel extends VBox {
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
 
         flightTable.getColumns().addAll(idColumn, numberColumn, originColumn, destinationColumn,
-                departureColumn, arrivalColumn, airlineColumn,
+                departureColumn, arrivalColumn, aircraftIdColumn,
                 totalSeatsColumn, availableSeatsColumn, priceColumn);
         flightTable.setItems(flightData);
     }

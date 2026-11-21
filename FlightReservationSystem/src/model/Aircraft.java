@@ -118,4 +118,12 @@ public class Aircraft {
      * @return The aircraft capacity property
      */
     public IntegerProperty capacityProperty() { return capacity; }
+
+    /**
+     * Creates a String representing the aircraft.
+     * @return A String containing the aircraft name and model
+     */
+    public String toString() {
+        return aircraftNameProperty().get() + " " + modelProperty().get();
+    }
 }

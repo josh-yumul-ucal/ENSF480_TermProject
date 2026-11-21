@@ -63,7 +63,7 @@ public class ReservationDAO {
     }
 
     /**
-     * Retrieves all reservations far a specific customer.
+     * Retrieves all reservations for a specific customer.
      * @param customerId The unique identifier of the customer
      * @return List of Reservation objects for the specified customer
      */

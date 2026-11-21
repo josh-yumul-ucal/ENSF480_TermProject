@@ -99,22 +99,11 @@ public class DatabaseManager {
                     destination TEXT NOT NULL,
                     departure_time TIMESTAMP NOT NULL,
                     arrival_time TIMESTAMP NOT NULL,
-                    airline TEXT NOT NULL,
+                    aircraft_id INTEGER NOT NULL,
                     total_seats INTEGER NOT NULL,
                     available_seats INTEGER NOT NULL,
-                    price REAL NOT NULL
-                )
-                """;
-
-            // Create Customers table
-            String createCustomersTable = """
-                CREATE TABLE IF NOT EXISTS customers (
-                    customer_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    first_name TEXT NOT NULL,
-                    last_name TEXT NOT NULL,
-                    email TEXT NOT NULL,
-                    phone TEXT,
-                    date_of_birth DATE
+                    price REAL NOT NULL,
+                    FOREIGN KEY (aircraft_id) REFERENCES aircraft (aircraft_id)
                 )
                 """;
 
@@ -128,7 +117,7 @@ public class DatabaseManager {
                     number_of_seats INTEGER NOT NULL,
                     total_amount REAL NOT NULL,
                     status TEXT NOT NULL,
-                    FOREIGN KEY (customer_id) REFERENCES customers (customer_id),
+                    FOREIGN KEY (customer_id) REFERENCES users (user_id),
                     FOREIGN KEY (flight_id) REFERENCES flights (flight_id)
                 )
                 """;
@@ -150,7 +139,6 @@ public class DatabaseManager {
             stmt.execute(createUserTable);
             stmt.execute(createAircraftTable);
             stmt.execute(createFlightsTable);
-            stmt.execute(createCustomersTable);
             stmt.execute(createReservationsTable);
             stmt.execute(createPaymentsTable);
 

@@ -52,7 +52,7 @@ public class FlightDAO {
                 flight.setDestination(rs.getString("destination"));
                 flight.setDepartureTime(rs.getTimestamp("departure_time"));
                 flight.setArrivalTime(rs.getTimestamp("arrival_time"));
-                flight.setAirline(rs.getString("airline"));
+                flight.setAircraftId(rs.getInt("aircraft_id"));
                 flight.setTotalSeats(rs.getInt("total_seats"));
                 flight.setAvailableSeats(rs.getInt("available_seats"));
                 flight.setPrice(rs.getDouble("price"));
@@ -109,7 +109,7 @@ public class FlightDAO {
                     flight.setDestination(rs.getString("destination"));
                     flight.setDepartureTime(rs.getTimestamp("departure_time"));
                     flight.setArrivalTime(rs.getTimestamp("arrival_time"));
-                    flight.setAirline(rs.getString("airline"));
+                    flight.setAircraftId(rs.getInt("aircraft_id"));
                     flight.setTotalSeats(rs.getInt("total_seats"));
                     flight.setAvailableSeats(rs.getInt("available_seats"));
                     flight.setPrice(rs.getDouble("price"));
@@ -129,7 +129,7 @@ public class FlightDAO {
      * @return true if flight creation was successful, false otherwise
      */
     public boolean addFlight(Flight flight) {
-        String sql = "INSERT INTO flights (flight_number, origin, destination, departure_time, arrival_time, airline, total_seats, available_seats, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO flights (flight_number, origin, destination, departure_time, arrival_time, aircraft_id, total_seats, available_seats, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -139,7 +139,7 @@ public class FlightDAO {
             stmt.setString(3, flight.getDestination());
             stmt.setTimestamp(4, new Timestamp(flight.getDepartureTime().getTime()));
             stmt.setTimestamp(5, new Timestamp(flight.getArrivalTime().getTime()));
-            stmt.setString(6, flight.getAirline());
+            stmt.setInt(6, flight.getAircraftId());
             stmt.setInt(7, flight.getTotalSeats());
             stmt.setInt(8, flight.getAvailableSeats());
             stmt.setDouble(9, flight.getPrice());
@@ -167,7 +167,7 @@ public class FlightDAO {
      * @return true if flight update was successful, false otherwise
      */
     public boolean updateFlight(Flight flight) {
-        String sql = "UPDATE flights SET flight_number = ?, origin = ?, destination = ?, departure_time = ?, arrival_time = ?, airline = ?, total_seats = ?, available_seats = ?, price = ? WHERE flight_id = ?";
+        String sql = "UPDATE flights SET flight_number = ?, origin = ?, destination = ?, departure_time = ?, arrival_time = ?, aircraft_id = ?, total_seats = ?, available_seats = ?, price = ? WHERE flight_id = ?";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -177,7 +177,7 @@ public class FlightDAO {
             stmt.setString(3, flight.getDestination());
             stmt.setTimestamp(4, new Timestamp(flight.getDepartureTime().getTime()));
             stmt.setTimestamp(5, new Timestamp(flight.getArrivalTime().getTime()));
-            stmt.setString(6, flight.getAirline());
+            stmt.setInt(6, flight.getAircraftId());
             stmt.setInt(7, flight.getTotalSeats());
             stmt.setInt(8, flight.getAvailableSeats());
             stmt.setDouble(9, flight.getPrice());
@@ -232,7 +232,7 @@ public class FlightDAO {
                     flight.setDestination(rs.getString("destination"));
                     flight.setDepartureTime(rs.getTimestamp("departure_time"));
                     flight.setArrivalTime(rs.getTimestamp("arrival_time"));
-                    flight.setAirline(rs.getString("airline"));
+                    flight.setAircraftId(rs.getInt("aircraft_id"));
                     flight.setTotalSeats(rs.getInt("total_seats"));
                     flight.setAvailableSeats(rs.getInt("available_seats"));
                     flight.setPrice(rs.getDouble("price"));
