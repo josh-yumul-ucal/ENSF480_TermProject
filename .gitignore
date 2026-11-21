@@ -8,3 +8,17 @@ target/
 
 .DS_Store
 Thumbs.db
+
+# Intellij files
+.idea
+*.iml
+
+# Project files
+flight_reservation.db
+
+# Additional resources
+Resources/
+
+# External libraries
+javafx-sdk-21.0.13
+sqlite-jdbc-3.53.4.0.jar
