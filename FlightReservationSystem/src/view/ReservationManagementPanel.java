@@ -12,6 +12,8 @@ package view;
 
 import controller.MainController;
 import model.Reservation;
+import model.User;
+import model.Flight;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -28,9 +30,10 @@ import java.text.SimpleDateFormat;
  */
 public class ReservationManagementPanel extends VBox {
     private MainController controller;
+    private User currentUser;
 
-    private TextField customerIdField;
-    private TextField flightIdField;
+    private ComboBox<User> customerIdComboBox;
+    private ComboBox<Flight> flightComboBox;
     private TextField bookingDateField; // Using text field for date input
     private TextField seatsField;
     private TextField amountField;
@@ -60,11 +63,43 @@ public class ReservationManagementPanel extends VBox {
      * Sets up the text fields, buttons, and table with column definitions.
      */
     private void initializeComponents() {
-        customerIdField = new TextField();
-        customerIdField.setPromptText("Customer ID");
+        // Create customer dropdown with User objects
+        ObservableList<User> customerList = FXCollections.observableArrayList();
+        customerIdComboBox = new ComboBox<>(customerList);
+        customerIdComboBox.setPromptText("Select Customer");
 
-        flightIdField = new TextField();
-        flightIdField.setPromptText("Flight ID");
+        // Set converter for customer combo box
+        customerIdComboBox.setConverter(new javafx.util.StringConverter<User>() {
+            @Override
+            public String toString(User user) {
+                if (user == null) return "";
+                return user.getFirstName() + " " + user.getLastName() + " (" + user.getUserId() + ")";
+            }
+
+            @Override
+            public User fromString(String string) {
+                return null; // Not needed for this use case
+            }
+        });
+
+        // Create flight dropdown
+        ObservableList<Flight> flightList = FXCollections.observableArrayList();
+        flightComboBox = new ComboBox<>(flightList);
+        flightComboBox.setPromptText("Select Flight");
+
+        // Set converter for flight combo box
+        flightComboBox.setConverter(new javafx.util.StringConverter<Flight>() {
+            @Override
+            public String toString(Flight flight) {
+                if (flight == null) return "";
+                return flight.getFlightNumber() + " (" + flight.getOrigin() + " to " + flight.getDestination() + ")";
+            }
+
+            @Override
+            public Flight fromString(String string) {
+                return null; // Not needed for this use case
+            }
+        });
 
         bookingDateField = new TextField();
         bookingDateField.setPromptText("Booking Date (YYYY-MM-DD HH:MM)");
@@ -124,11 +159,11 @@ public class ReservationManagementPanel extends VBox {
         inputPanel.setHgap(10);
         inputPanel.setVgap(10);
 
-        inputPanel.add(new Label("Customer ID:"), 0, 0);
-        inputPanel.add(customerIdField, 1, 0);
+        inputPanel.add(new Label("Customer:"), 0, 0);
+        inputPanel.add(customerIdComboBox, 1, 0);
 
-        inputPanel.add(new Label("Flight ID:"), 0, 1);
-        inputPanel.add(flightIdField, 1, 1);
+        inputPanel.add(new Label("Flight:"), 0, 1);
+        inputPanel.add(flightComboBox, 1, 1);
 
         inputPanel.add(new Label("Booking Date (YYYY-MM-DD HH:MM):"), 0, 2);
         inputPanel.add(bookingDateField, 1, 2);
@@ -174,6 +209,15 @@ public class ReservationManagementPanel extends VBox {
                 loadReservationData(newSelection);
             }
         });
+    }
+
+    /**
+     * Sets the current user for role-based filtering
+     * @param currentUser The currently logged in user
+     */
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+        refreshReservations();
     }
 
     /**
@@ -244,9 +288,36 @@ public class ReservationManagementPanel extends VBox {
      * This ensures that the auto-generated IDs are properly loaded after record creation.
      */
     private void refreshReservations() {
-        List<Reservation> reservations = controller.getAllReservations();
+        List<Reservation> reservations;
+
+        // If current user is a customer, filter reservations by customer ID
+        if (currentUser != null && "Customer".equals(currentUser.getRole())) {
+            reservations = controller.getReservationsByCustomerId(currentUser.getUserId());
+        } else {
+            reservations = controller.getAllReservations();
+        }
+
         reservationData.clear();
         reservationData.addAll(reservations);
+
+        // Also populate flight and customer dropdowns
+        ObservableList<Flight> flightList = FXCollections.observableArrayList();
+        for (Flight flight : controller.getAllFlights()) {
+            flightList.add(flight);
+        }
+        flightComboBox.setItems(flightList);
+
+        // Populate customer dropdown with User objects
+        ObservableList<User> userList = FXCollections.observableArrayList();
+        List<User> allUsers = controller.getAllUsers();
+
+        // If current user is a customer, only show the current user in the dropdown
+        if (currentUser != null && "Customer".equals(currentUser.getRole())) {
+            userList.add(currentUser);
+        } else {
+            userList.addAll(allUsers);
+        }
+        customerIdComboBox.setItems(userList);
     }
 
     /**
@@ -255,22 +326,21 @@ public class ReservationManagementPanel extends VBox {
      * @return Reservation object if validation passes, null otherwise
      */
     private Reservation createReservationFromInput() {
-        String customerIdStr = customerIdField.getText().trim();
-        String flightIdStr = flightIdField.getText().trim();
+        User selectedUser = customerIdComboBox.getValue();
+        Flight selectedFlight = flightComboBox.getValue();
         String bookingDateStr = bookingDateField.getText().trim();
         String seatsStr = seatsField.getText().trim();
         String amountStr = amountField.getText().trim();
         String status = statusField.getText().trim();
 
-        if (customerIdStr.isEmpty() || flightIdStr.isEmpty() || bookingDateStr.isEmpty() ||
+        if (selectedUser == null || selectedFlight == null || bookingDateStr.isEmpty() ||
                 seatsStr.isEmpty() || amountStr.isEmpty() || status.isEmpty()) {
             showAlert("Error", "Please fill in all required fields");
             return null;
         }
 
         try {
-            int customerId = Integer.parseInt(customerIdStr);
-            int flightId = Integer.parseInt(flightIdStr);
+            int customerId = selectedUser.getUserId();
             int seats = Integer.parseInt(seatsStr);
             double amount = Double.parseDouble(amountStr);
 
@@ -279,7 +349,7 @@ public class ReservationManagementPanel extends VBox {
 
             Reservation reservation = new Reservation();
             reservation.setCustomerId(customerId);
-            reservation.setFlightId(flightId);
+            reservation.setFlightId(selectedFlight.getFlightId());
             reservation.setBookingDate(bookingDate);
             reservation.setNumberOfSeats(seats);
             reservation.setTotalAmount(amount);
@@ -298,8 +368,30 @@ public class ReservationManagementPanel extends VBox {
      * @param reservation The Reservation object to load data from
      */
     private void loadReservationData(Reservation reservation) {
-        customerIdField.setText(String.valueOf(reservation.getCustomerId()));
-        flightIdField.setText(String.valueOf(reservation.getFlightId()));
+        // Set customer in dropdown
+        if (reservation.getCustomerId() > 0) {
+            for (User user : customerIdComboBox.getItems()) {
+                if (user.getUserId() == reservation.getCustomerId()) {
+                    customerIdComboBox.setValue(user);
+                    break;
+                }
+            }
+        } else {
+            customerIdComboBox.setValue(null);
+        }
+
+        // Set flight in dropdown
+        if (reservation.getFlightId() > 0) {
+            for (Flight flight : flightComboBox.getItems()) {
+                if (flight.getFlightId() == reservation.getFlightId()) {
+                    flightComboBox.setValue(flight);
+                    break;
+                }
+            }
+        } else {
+            flightComboBox.setValue(null);
+        }
+
         bookingDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(reservation.getBookingDate()));
         seatsField.setText(String.valueOf(reservation.getNumberOfSeats()));
         amountField.setText(String.valueOf(reservation.getTotalAmount()));
@@ -311,8 +403,8 @@ public class ReservationManagementPanel extends VBox {
      * Used after the successful creation or when resetting the form.
      */
     private void clearInputFields() {
-        customerIdField.clear();
-        flightIdField.clear();
+        customerIdComboBox.setValue(null);
+        flightComboBox.setValue(null);
         bookingDateField.clear();
         seatsField.clear();
         amountField.clear();

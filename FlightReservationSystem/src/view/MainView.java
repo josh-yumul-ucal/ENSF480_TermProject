@@ -61,6 +61,9 @@ public class MainView extends BorderPane {
         aircraftManagementPanel = new AircraftManagementPanel(controller);
         userManagementPanel = new UserManagementPanel(controller);
 
+        // Set current user for reservation panel
+        reservationManagementPanel.setCurrentUser(currentUser);
+
         tabPane = new TabPane();
 
         // Add tabs common to all user roles

@@ -89,6 +89,20 @@ public class FlightManagementPanel extends VBox {
         aircraftComboBox = new ComboBox<>(aircraftList);
         aircraftComboBox.setPromptText("Select Aircraft");
 
+        // Set converter for aircraft combo box
+        aircraftComboBox.setConverter(new javafx.util.StringConverter<Aircraft>() {
+            @Override
+            public String toString(Aircraft aircraft) {
+                if (aircraft == null) return "";
+                return aircraft.getAircraftName() + " (" + aircraft.getModel() + ")";
+            }
+
+            @Override
+            public Aircraft fromString(String string) {
+                return null; // Not needed for this use case
+            }
+        });
+
         addButton = new Button("Add Flight");
         updateButton = new Button("Update Flight");
         deleteButton = new Button("Delete Flight");
@@ -384,7 +398,7 @@ public class FlightManagementPanel extends VBox {
         arrivalDateField.clear();
         totalSeatsField.clear();
         priceField.clear();
-        aircraftComboBox.setPromptText("Select Aircraft");
+        aircraftComboBox.setValue(null);
     }
 
     /**
