@@ -34,6 +34,8 @@ public class MainController {
 
     private MainView mainView;
 
+    private User currentUser;
+
     /**
      * Initializes the MainController and sets up all necessary services.
      * This constructor creates instances of the database manager and all service classes.
@@ -45,6 +47,7 @@ public class MainController {
         this.paymentService = new PaymentService(dbManager);
         this.userService = new UserService(dbManager);
         this.aircraftService = new AircraftService(dbManager);
+        this.currentUser = null;
     }
 
     /**
@@ -72,7 +75,9 @@ public class MainController {
      * @param primaryStage The primary stage of the JavaFX application
      */
     public void showMainApplication(User user, Stage primaryStage) {
-        mainView = new MainView(this, user, primaryStage);
+        currentUser = user;
+
+        mainView = new MainView(this, primaryStage);
         mainView.showView();
     }
 
@@ -226,6 +231,14 @@ public class MainController {
      */
     public boolean deletePayment(int id) {
         return paymentService.deletePayment(id);
+    }
+
+    /**
+     * Gets the current user object
+     * @return currentUser The current user that has logged in
+     */
+    public User getCurrentUser() {
+        return currentUser;
     }
 
     /**

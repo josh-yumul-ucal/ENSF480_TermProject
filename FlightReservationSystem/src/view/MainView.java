@@ -31,18 +31,15 @@ public class MainView extends BorderPane {
     private UserManagementPanel userManagementPanel;
 
     private MainController controller;
-    private User currentUser;
     private Stage primaryStage;
 
     /**
      * Initializes the main application view with controller and user data.
      * @param controller The main application controller
-     * @param user The authenticated user object
      * @param primaryStage The primary JavaFX stage
      */
-    public MainView(MainController controller, User user, Stage primaryStage) {
+    public MainView(MainController controller, Stage primaryStage) {
         this.controller = controller;
-        this.currentUser = user;
         this.primaryStage = primaryStage;
         initializeComponents();
         setupLayout();
@@ -61,23 +58,22 @@ public class MainView extends BorderPane {
         aircraftManagementPanel = new AircraftManagementPanel(controller);
         userManagementPanel = new UserManagementPanel(controller);
 
-        // Set current user for reservation panel
-        reservationManagementPanel.setCurrentUser(currentUser);
-
         tabPane = new TabPane();
 
         // Add tabs common to all user roles
         tabPane.getTabs().add(new Tab("Flight Search", flightSearchPanel));
         tabPane.getTabs().add(new Tab("Reservation Management", reservationManagementPanel));
 
-        // Add role-specific tabs
-        if (currentUser.getRole().equals("System Administrator")) {
-            tabPane.getTabs().add(new Tab("Flight Management", flightManagementPanel));
-            tabPane.getTabs().add(new Tab("Aircraft Management", aircraftManagementPanel));
-            tabPane.getTabs().add(new Tab("User Management", userManagementPanel));
-        } else if (currentUser.getRole().equals("Flight Agent")) {
-            tabPane.getTabs().add(new Tab("Flight Management", flightManagementPanel));
-            tabPane.getTabs().add(new Tab("Aircraft Management", aircraftManagementPanel));
+        if (controller.getCurrentUser() != null) {
+            // Add role-specific tabs
+            if (controller.getCurrentUser().getRole().equals("System Administrator")) {
+                tabPane.getTabs().add(new Tab("Flight Management", flightManagementPanel));
+                tabPane.getTabs().add(new Tab("Aircraft Management", aircraftManagementPanel));
+                tabPane.getTabs().add(new Tab("User Management", userManagementPanel));
+            } else if (controller.getCurrentUser().getRole().equals("Flight Agent")) {
+                tabPane.getTabs().add(new Tab("Flight Management", flightManagementPanel));
+                tabPane.getTabs().add(new Tab("Aircraft Management", aircraftManagementPanel));
+            }
         }
 
         // Note: Customer role should not have access to user management
@@ -111,7 +107,9 @@ public class MainView extends BorderPane {
      * Sets the stage title and shows the application window.
      */
     public void showView() {
-        primaryStage.setTitle("Flight Reservation System - " + currentUser.getRole() + " (" + currentUser.getUsername() + ")");
+        if (controller.getCurrentUser() != null) {
+            primaryStage.setTitle("Flight Reservation System - " + controller.getCurrentUser().getRole() + " (" + controller.getCurrentUser().getUsername() + ")");
+        }
         primaryStage.setScene(new javafx.scene.Scene(this, 1200, 700));
         primaryStage.show();
     }

@@ -30,7 +30,6 @@ import java.text.SimpleDateFormat;
  */
 public class ReservationManagementPanel extends VBox {
     private MainController controller;
-    private User currentUser;
 
     private ComboBox<User> customerIdComboBox;
     private ComboBox<Flight> flightComboBox;
@@ -212,15 +211,6 @@ public class ReservationManagementPanel extends VBox {
     }
 
     /**
-     * Sets the current user for role-based filtering
-     * @param currentUser The currently logged in user
-     */
-    public void setCurrentUser(User currentUser) {
-        this.currentUser = currentUser;
-        refreshReservations();
-    }
-
-    /**
      * Adds a new reservation.
      * Validates the input and refreshes the table display after successful creation.
      */
@@ -291,8 +281,8 @@ public class ReservationManagementPanel extends VBox {
         List<Reservation> reservations;
 
         // If current user is a customer, filter reservations by customer ID
-        if (currentUser != null && "Customer".equals(currentUser.getRole())) {
-            reservations = controller.getReservationsByCustomerId(currentUser.getUserId());
+        if (controller.getCurrentUser() != null && "Customer".equals(controller.getCurrentUser().getRole())) {
+            reservations = controller.getReservationsByCustomerId(controller.getCurrentUser().getUserId());
         } else {
             reservations = controller.getAllReservations();
         }
@@ -312,8 +302,8 @@ public class ReservationManagementPanel extends VBox {
         List<User> allUsers = controller.getAllUsers();
 
         // If current user is a customer, only show the current user in the dropdown
-        if (currentUser != null && "Customer".equals(currentUser.getRole())) {
-            userList.add(currentUser);
+        if (controller.getCurrentUser() != null && "Customer".equals(controller.getCurrentUser().getRole())) {
+            userList.add(controller.getCurrentUser());
         } else {
             userList.addAll(allUsers);
         }
