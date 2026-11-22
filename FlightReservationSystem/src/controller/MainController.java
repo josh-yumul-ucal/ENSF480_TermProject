@@ -209,6 +209,26 @@ public class MainController {
     }
 
     /**
+     * Updates a payment record in the database.
+     * Uses the payment_id from the provided Payment object to determine which record is to be updated.
+     * @param payment The Payment object containing the updated details
+     * @return true if the payment update was successful, false otherwise
+     */
+    public boolean updatePayment(Payment payment) {
+        return paymentService.updatePayment(payment);
+    }
+
+    /**
+     * Deletes a payment record from the database.
+     * This method deletes the payment record but does not modify the reservation.
+     * @param id The unique ID of the payment to delete
+     * @return true if the payment deletion was successful, false otherwise
+     */
+    public boolean deletePayment(int id) {
+        return paymentService.deletePayment(id);
+    }
+
+    /**
      * Retrieves all users from the database.
      * Used in user management panels to display user listings.
      * @return List of all User objects

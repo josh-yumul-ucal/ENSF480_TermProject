@@ -36,6 +36,8 @@ public class PaymentPanel extends VBox {
     private TextField methodField;
     private TextField transactionIdField;
     private Button addButton;
+    private Button updateButton;
+    private Button deleteButton;
     private Button refreshButton;
     private TableView<Payment> paymentTable;
     private ObservableList<Payment> paymentData;
@@ -90,6 +92,8 @@ public class PaymentPanel extends VBox {
         transactionIdField.setPromptText("Transaction ID");
 
         addButton = new Button("Add Payment");
+        updateButton = new Button("Update Payment");
+        deleteButton = new Button("Delete Payment");
         refreshButton = new Button("Refresh");
 
         paymentData = FXCollections.observableArrayList();
@@ -146,7 +150,7 @@ public class PaymentPanel extends VBox {
         inputPanel.add(transactionIdField, 1, 4);
 
         HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(addButton, refreshButton);
+        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton);
 
         VBox inputBox = new VBox(10);
         inputBox.getChildren().addAll(inputPanel, buttonBox);
@@ -168,7 +172,15 @@ public class PaymentPanel extends VBox {
      */
     private void setupEventHandlers() {
         addButton.setOnAction(e -> addPayment());
+        updateButton.setOnAction(e -> updatePayment());
+        deleteButton.setOnAction(e -> deletePayment());
         refreshButton.setOnAction(e -> refreshPayments());
+
+        paymentTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                loadPaymentData(newSelection);
+            }
+        });
     }
 
     /**
@@ -184,6 +196,52 @@ public class PaymentPanel extends VBox {
                 clearInputFields();
             } else {
                 showAlert("Error", "Failed to add payment");
+            }
+        }
+    }
+
+    /**
+     * Updates an existing payment record.
+     * Uses the selected item's payment ID.
+     */
+    private void updatePayment() {
+        Payment selected = paymentTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Error", "Please select a payment to update");
+            return;
+        }
+
+        Payment payment = createPaymentFromInput();
+        if (payment != null) {
+            // Preserve the ID from the original selection
+            payment.setPaymentId(selected.getPaymentId());
+
+            if (controller.updatePayment(payment)) {
+                showAlert("Success", "Payment updated successfully");
+                refreshPayments();
+            } else {
+                showAlert("Error", "Failed to update payment");
+            }
+        }
+    }
+
+    /**
+     * Deletes a payment record.
+     * Prompts for user confirmation before the deletion occurs.
+     */
+    private void deletePayment() {
+        Payment selected = paymentTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Error", "Please select a payment to delete");
+            return;
+        }
+
+        if (confirmAction("Are you sure you want to delete this payment?")) {
+            if (controller.deletePayment(selected.getPaymentId())) { // Use actual ID
+                showAlert("Success", "Payment deleted successfully");
+                refreshPayments();
+            } else {
+                showAlert("Error", "Failed to delete payment");
             }
         }
     }
@@ -246,6 +304,29 @@ public class PaymentPanel extends VBox {
     }
 
     /**
+     * Loads the data from the Payment object into the input fields.
+     * @param payment The Payment object to load data from
+     */
+    private void loadPaymentData(Payment payment) {
+        // Set reservation in dropdown
+        if (payment.getReservationId() > 0) {
+            for (Reservation reservation : reservationComboBox.getItems()) {
+                if (reservation.getReservationId() == payment.getReservationId()) {
+                    reservationComboBox.setValue(reservation);
+                    break;
+                }
+            }
+        } else {
+            reservationComboBox.setValue(null);
+        }
+
+        paymentDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(payment.getPaymentDate()));
+        amountField.setText(String.valueOf(payment.getAmount()));
+        methodField.setText(payment.getPaymentMethod());
+        transactionIdField.setText(payment.getTransactionId());
+    }
+
+    /**
      * Clears all of the input fields in the form.
      * Used after the successful creation or when resetting the form.
      */
@@ -268,5 +349,19 @@ public class PaymentPanel extends VBox {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    /**
+     * Displays a confirmation dialog with the provided message.
+     * @param message The message to the user
+     * @return true if the user clicks OK, false otherwise
+     */
+    private boolean confirmAction(String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Action");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        return alert.showAndWait().filter(response -> response == ButtonType.OK).isPresent();
     }
 }
