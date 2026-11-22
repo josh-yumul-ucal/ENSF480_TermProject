@@ -56,6 +56,7 @@ public class FlightDAO {
                 flight.setTotalSeats(rs.getInt("total_seats"));
                 flight.setAvailableSeats(rs.getInt("available_seats"));
                 flight.setPrice(rs.getDouble("price"));
+                flight.setAirline(rs.getString("airline"));
                 flights.add(flight);
             }
         } catch (SQLException e) {
@@ -65,13 +66,14 @@ public class FlightDAO {
     }
 
     /**
-     * Searches for flights based on origin, destination, and date.
+     * Searches for flights based on origin, destination, date and airline.
      * @param origin The departure airport code or city name
      * @param destination The arrival airport code or city name
      * @param date The scheduled departure date
+     * @param airline The airline name
      * @return List of Flight objects that match the search criteria
      */
-    public List<Flight> searchFlights(String origin, String destination, java.util.Date date) {
+    public List<Flight> searchFlights(String origin, String destination, java.util.Date date, String airline) {
         // Build dynamic query based on provided parameters
         StringBuilder sql = new StringBuilder("SELECT * FROM flights WHERE 1=1");
         List<Object> params = new ArrayList<>();
@@ -89,6 +91,12 @@ public class FlightDAO {
         if (date != null) {
             sql.append(" AND DATE(departure_time) = ?");
             params.add(new java.sql.Date(date.getTime()));
+        }
+
+        // Add airline search parameter
+        if (airline != null && !airline.trim().isEmpty()) {
+            sql.append(" AND airline LIKE ?");
+            params.add("%" + airline.trim() + "%");
         }
 
         List<Flight> flights = new ArrayList<>();
@@ -113,6 +121,7 @@ public class FlightDAO {
                     flight.setTotalSeats(rs.getInt("total_seats"));
                     flight.setAvailableSeats(rs.getInt("available_seats"));
                     flight.setPrice(rs.getDouble("price"));
+                    flight.setAirline(rs.getString("airline"));
                     flights.add(flight);
                 }
             }
@@ -129,7 +138,7 @@ public class FlightDAO {
      * @return true if flight creation was successful, false otherwise
      */
     public boolean addFlight(Flight flight) {
-        String sql = "INSERT INTO flights (flight_number, origin, destination, departure_time, arrival_time, aircraft_id, total_seats, available_seats, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO flights (flight_number, origin, destination, departure_time, arrival_time, aircraft_id, total_seats, available_seats, price, airline) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -143,6 +152,7 @@ public class FlightDAO {
             stmt.setInt(7, flight.getTotalSeats());
             stmt.setInt(8, flight.getAvailableSeats());
             stmt.setDouble(9, flight.getPrice());
+            stmt.setString(10, flight.getAirline());
 
             boolean result = stmt.executeUpdate() > 0;
 
@@ -167,7 +177,7 @@ public class FlightDAO {
      * @return true if flight update was successful, false otherwise
      */
     public boolean updateFlight(Flight flight) {
-        String sql = "UPDATE flights SET flight_number = ?, origin = ?, destination = ?, departure_time = ?, arrival_time = ?, aircraft_id = ?, total_seats = ?, available_seats = ?, price = ? WHERE flight_id = ?";
+        String sql = "UPDATE flights SET flight_number = ?, origin = ?, destination = ?, departure_time = ?, arrival_time = ?, aircraft_id = ?, total_seats = ?, available_seats = ?, price = ?, airline = ? WHERE flight_id = ?";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -181,7 +191,8 @@ public class FlightDAO {
             stmt.setInt(7, flight.getTotalSeats());
             stmt.setInt(8, flight.getAvailableSeats());
             stmt.setDouble(9, flight.getPrice());
-            stmt.setInt(10, flight.getFlightId());
+            stmt.setString(10, flight.getAirline());
+            stmt.setInt(11, flight.getFlightId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -236,6 +247,7 @@ public class FlightDAO {
                     flight.setTotalSeats(rs.getInt("total_seats"));
                     flight.setAvailableSeats(rs.getInt("available_seats"));
                     flight.setPrice(rs.getDouble("price"));
+                    flight.setAirline(rs.getString("airline"));
                     return flight;
                 }
             }

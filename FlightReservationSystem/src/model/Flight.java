@@ -29,6 +29,7 @@ public class Flight {
     private final IntegerProperty availableSeats;
     private final DoubleProperty price;
     private final ObjectProperty<Aircraft> aircraft;
+    private final StringProperty airline;
 
     // Constructors
 
@@ -47,6 +48,7 @@ public class Flight {
         this.availableSeats = new SimpleIntegerProperty();
         this.price = new SimpleDoubleProperty();
         this.aircraft = new SimpleObjectProperty<>();
+        this.airline = new SimpleStringProperty();
     }
 
     /**
@@ -76,6 +78,7 @@ public class Flight {
         this.availableSeats = new SimpleIntegerProperty(availableSeats);
         this.price = new SimpleDoubleProperty(price);
         this.aircraft = new SimpleObjectProperty<>();
+        this.airline = new SimpleStringProperty();
     }
 
     /**
@@ -275,4 +278,28 @@ public class Flight {
      * @return The aircraft property
      */
     public ObjectProperty<Aircraft> aircraftProperty() { return aircraft; }
+
+    /**
+     * Sets the airline assigned to this flight
+     * @param airline The airline object
+     */
+    public void setAirline(String airline) {
+        this.airline.set(airline);
+    }
+
+    /**
+     * Gets the airline for this flight.
+     * @return The airline for this flight
+     */
+    public String getAirline() {
+        return airline.get();
+    }
+
+    /**
+     * Gets JavaFX property for airline
+     * @return The airline property
+     */
+    public StringProperty airlineProperty() {
+        return airline;
+    }
 }

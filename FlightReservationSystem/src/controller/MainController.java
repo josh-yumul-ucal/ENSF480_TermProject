@@ -92,10 +92,11 @@ public class MainController {
      * @param origin The departure airport code or city name
      * @param destination The arrival airport code or city name
      * @param date The scheduled departure date
+     * @param airline The airline name
      * @return List of Flight objects matching the search criteria
      */
-    public List<Flight> searchFlights(String origin, String destination, Date date) {
-        return flightService.searchFlights(origin, destination, date);
+    public List<Flight> searchFlights(String origin, String destination, Date date, String airline) {
+        return flightService.searchFlights(origin, destination, date, airline);
     }
 
     /**

@@ -22,13 +22,14 @@ import java.util.Date;
 
 /**
  * View component for flight search.
- * Provides a user interface for searching flights using origin, destination, and date criteria.
+ * Provides a user interface for searching flights using origin, destination, date and airline criteria.
  * Displays the search results in a table format with flight information.
  */
 public class FlightSearchPanel extends VBox {
     private MainController controller;
     private TextField originField;
     private TextField destinationField;
+    private TextField airlineField;
     private TextField dateField;
     private Button searchButton;
     private TableView<Flight> flightTable;
@@ -57,6 +58,9 @@ public class FlightSearchPanel extends VBox {
         destinationField = new TextField();
         destinationField.setPromptText("Destination");
 
+        airlineField = new TextField();
+        airlineField.setPromptText("Airline");
+
         dateField = new TextField();
         dateField.setPromptText("Date (YYYY-MM-DD)");
 
@@ -84,6 +88,9 @@ public class FlightSearchPanel extends VBox {
         TableColumn<Flight, Date> arrivalColumn = new TableColumn<>("Arrival Time");
         arrivalColumn.setCellValueFactory(cellData -> cellData.getValue().arrivalTimeProperty());
 
+        TableColumn<Flight, String> airlineColumn = new TableColumn<>("Airline");
+        airlineColumn.setCellValueFactory(cellData -> cellData.getValue().airlineProperty());
+
         TableColumn<Flight, Integer> aircraftIdColumn = new TableColumn<>("Aircraft ID");
         aircraftIdColumn.setCellValueFactory(cellData -> cellData.getValue().aircraftIdProperty().asObject());
 
@@ -97,7 +104,8 @@ public class FlightSearchPanel extends VBox {
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
 
         flightTable.getColumns().addAll(idColumn, numberColumn, originColumn, destinationColumn,
-                departureColumn, arrivalColumn, aircraftIdColumn,
+                departureColumn, arrivalColumn, airlineColumn,
+                aircraftIdColumn,
                 totalSeatsColumn, availableSeatsColumn, priceColumn);
         flightTable.setItems(flightData);
     }
@@ -115,6 +123,7 @@ public class FlightSearchPanel extends VBox {
         searchPanel.getChildren().addAll(
                 new Label("Origin:"), originField,
                 new Label("Destination:"), destinationField,
+                new Label("Airline:"), airlineField,
                 new Label("Date (YYYY-MM-DD):"), dateField,
                 searchButton
         );
@@ -145,6 +154,7 @@ public class FlightSearchPanel extends VBox {
     private void searchFlights() {
         String origin = originField.getText().trim();
         String destination = destinationField.getText().trim();
+        String airline = airlineField.getText().trim();
         String dateStr = dateField.getText().trim();
 
         Date date = null;
@@ -159,7 +169,7 @@ public class FlightSearchPanel extends VBox {
         }
 
         // Perform search
-        List<Flight> flights = controller.searchFlights(origin, destination, date);
+        List<Flight> flights = controller.searchFlights(origin, destination, date, airline);
 
         // Clear existing data
         flightData.clear();

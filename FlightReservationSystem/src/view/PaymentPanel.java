@@ -12,6 +12,7 @@ package view;
 
 import controller.MainController;
 import model.Payment;
+import model.Reservation;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -29,7 +30,7 @@ import java.text.SimpleDateFormat;
 public class PaymentPanel extends VBox {
     private MainController controller;
 
-    private TextField reservationIdField;
+    private ComboBox<Reservation> reservationComboBox;
     private TextField paymentDateField; // Using text field for date input
     private TextField amountField;
     private TextField methodField;
@@ -57,8 +58,24 @@ public class PaymentPanel extends VBox {
      * Sets up the text fields, buttons, and table with column definitions.
      */
     private void initializeComponents() {
-        reservationIdField = new TextField();
-        reservationIdField.setPromptText("Reservation ID");
+        // Create reservation dropdown
+        ObservableList<Reservation> reservationList = FXCollections.observableArrayList();
+        reservationComboBox = new ComboBox<>(reservationList);
+        reservationComboBox.setPromptText("Select Reservation");
+
+        // Set converter for reservation combo box
+        reservationComboBox.setConverter(new javafx.util.StringConverter<Reservation>() {
+            @Override
+            public String toString(Reservation reservation) {
+                if (reservation == null) return "";
+                return "Customer_" + reservation.getCustomerId() + " (" + reservation.getReservationId() + ")";
+            }
+
+            @Override
+            public Reservation fromString(String string) {
+                return null; // Not needed for this use case
+            }
+        });
 
         paymentDateField = new TextField();
         paymentDateField.setPromptText("Payment Date (YYYY-MM-DD HH:MM)");
@@ -113,8 +130,8 @@ public class PaymentPanel extends VBox {
         inputPanel.setHgap(10);
         inputPanel.setVgap(10);
 
-        inputPanel.add(new Label("Reservation ID:"), 0, 0);
-        inputPanel.add(reservationIdField, 1, 0);
+        inputPanel.add(new Label("Reservation:"), 0, 0);
+        inputPanel.add(reservationComboBox, 1, 0);
 
         inputPanel.add(new Label("Payment Date (YYYY-MM-DD HH:MM):"), 0, 1);
         inputPanel.add(paymentDateField, 1, 1);
@@ -179,6 +196,14 @@ public class PaymentPanel extends VBox {
         List<Payment> payments = controller.getAllPayments();
         paymentData.clear();
         paymentData.addAll(payments);
+
+        // Also populate reservation dropdown
+        ObservableList<Reservation> reservationList = FXCollections.observableArrayList();
+        for (Reservation reservation : controller.getAllReservations()) {
+            reservationList.add(reservation);
+        }
+        reservationComboBox.setItems(reservationList);
+        reservationComboBox.setValue(null);
     }
 
     /**
@@ -187,20 +212,20 @@ public class PaymentPanel extends VBox {
      * @return Payment object if validation passes, null otherwise
      */
     private Payment createPaymentFromInput() {
-        String reservationIdStr = reservationIdField.getText().trim();
+        Reservation selectedReservation = reservationComboBox.getValue();
         String paymentDateStr = paymentDateField.getText().trim();
         String amountStr = amountField.getText().trim();
         String method = methodField.getText().trim();
         String transactionId = transactionIdField.getText().trim();
 
-        if (reservationIdStr.isEmpty() || paymentDateStr.isEmpty() ||
+        if (selectedReservation == null || paymentDateStr.isEmpty() ||
                 amountStr.isEmpty() || method.isEmpty() || transactionId.isEmpty()) {
             showAlert("Error", "Please fill in all required fields");
             return null;
         }
 
         try {
-            int reservationId = Integer.parseInt(reservationIdStr);
+            int reservationId = selectedReservation.getReservationId();
             double amount = Double.parseDouble(amountStr);
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -225,7 +250,7 @@ public class PaymentPanel extends VBox {
      * Used after the successful creation or when resetting the form.
      */
     private void clearInputFields() {
-        reservationIdField.clear();
+        reservationComboBox.setValue(null);
         paymentDateField.clear();
         amountField.clear();
         methodField.clear();

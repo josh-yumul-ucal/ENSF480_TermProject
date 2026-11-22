@@ -103,6 +103,7 @@ public class DatabaseManager {
                     total_seats INTEGER NOT NULL,
                     available_seats INTEGER NOT NULL,
                     price REAL NOT NULL,
+                    airline TEXT,
                     FOREIGN KEY (aircraft_id) REFERENCES aircraft (aircraft_id)
                 )
                 """;

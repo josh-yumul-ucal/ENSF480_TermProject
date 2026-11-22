@@ -33,6 +33,7 @@ public class FlightManagementPanel extends VBox {
     private TextField flightNumberField;
     private TextField originField;
     private TextField destinationField;
+    private TextField airlineField;
     private TextField departureDateField; // Using text field for date input
     private TextField arrivalDateField; // Using text field for date input
     private TextField totalSeatsField;
@@ -71,6 +72,9 @@ public class FlightManagementPanel extends VBox {
 
         destinationField = new TextField();
         destinationField.setPromptText("Destination");
+
+        airlineField = new TextField();
+        airlineField.setPromptText("Airline");
 
         departureDateField = new TextField();
         departureDateField.setPromptText("Departure Date (YYYY-MM-DD HH:MM)");
@@ -121,6 +125,9 @@ public class FlightManagementPanel extends VBox {
         TableColumn<Flight, String> destinationColumn = new TableColumn<>("Destination");
         destinationColumn.setCellValueFactory(cellData -> cellData.getValue().destinationProperty());
 
+        TableColumn<Flight, String> airlineColumn = new TableColumn<>("Airline");
+        airlineColumn.setCellValueFactory(cellData -> cellData.getValue().airlineProperty());
+
         TableColumn<Flight, Date> departureColumn = new TableColumn<>("Departure Time");
         departureColumn.setCellValueFactory(cellData -> cellData.getValue().departureTimeProperty());
 
@@ -137,6 +144,7 @@ public class FlightManagementPanel extends VBox {
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
 
         flightTable.getColumns().addAll(numberColumn, originColumn, destinationColumn,
+                airlineColumn,
                 departureColumn, arrivalColumn, aircraftIdColumn,
                 totalSeatsColumn, priceColumn);
         flightTable.setItems(flightData);
@@ -165,20 +173,23 @@ public class FlightManagementPanel extends VBox {
         inputPanel.add(new Label("Destination:"), 0, 2);
         inputPanel.add(destinationField, 1, 2);
 
-        inputPanel.add(new Label("Departure Date (YYYY-MM-DD HH:MM):"), 0, 3);
-        inputPanel.add(departureDateField, 1, 3);
+        inputPanel.add(new Label("Airline:"), 0, 3);
+        inputPanel.add(airlineField, 1, 3);
 
-        inputPanel.add(new Label("Arrival Date (YYYY-MM-DD HH:MM):"), 0, 4);
-        inputPanel.add(arrivalDateField, 1, 4);
+        inputPanel.add(new Label("Departure Date (YYYY-MM-DD HH:MM):"), 0, 4);
+        inputPanel.add(departureDateField, 1, 4);
 
-        inputPanel.add(new Label("Total Seats:"), 0, 5);
-        inputPanel.add(totalSeatsField, 1, 5);
+        inputPanel.add(new Label("Arrival Date (YYYY-MM-DD HH:MM):"), 0, 5);
+        inputPanel.add(arrivalDateField, 1, 5);
 
-        inputPanel.add(new Label("Price:"), 0, 6);
-        inputPanel.add(priceField, 1, 6);
+        inputPanel.add(new Label("Total Seats:"), 0, 6);
+        inputPanel.add(totalSeatsField, 1, 6);
 
-        inputPanel.add(new Label("Aircraft:"), 0, 7);
-        inputPanel.add(aircraftComboBox, 1, 7); // Aircraft dropdown
+        inputPanel.add(new Label("Price:"), 0, 7);
+        inputPanel.add(priceField, 1, 7);
+
+        inputPanel.add(new Label("Aircraft:"), 0, 8);
+        inputPanel.add(aircraftComboBox, 1, 8);
 
         HBox buttonBox = new HBox(10);
         buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton);
@@ -292,6 +303,7 @@ public class FlightManagementPanel extends VBox {
             aircraftList.add(aircraft);
         }
         aircraftComboBox.setItems(aircraftList);
+        aircraftComboBox.setValue(null);
     }
 
     /**
@@ -303,6 +315,7 @@ public class FlightManagementPanel extends VBox {
         String flightNumber = flightNumberField.getText().trim();
         String origin = originField.getText().trim();
         String destination = destinationField.getText().trim();
+        String airline = airlineField.getText().trim();
         String departureDateStr = departureDateField.getText().trim();
         String arrivalDateStr = arrivalDateField.getText().trim();
         String totalSeatsStr = totalSeatsField.getText().trim();
@@ -328,6 +341,7 @@ public class FlightManagementPanel extends VBox {
             flight.setFlightNumber(flightNumber);
             flight.setOrigin(origin);
             flight.setDestination(destination);
+            flight.setAirline(airline);
             flight.setDepartureTime(departureDate);
             flight.setArrivalTime(arrivalDate);
             flight.setTotalSeats(totalSeats);
@@ -355,6 +369,7 @@ public class FlightManagementPanel extends VBox {
         flightNumberField.setText(flight.getFlightNumber());
         originField.setText(flight.getOrigin());
         destinationField.setText(flight.getDestination());
+        airlineField.setText(flight.getAirline());
         departureDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(flight.getDepartureTime()));
         arrivalDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(flight.getArrivalTime()));
         totalSeatsField.setText(String.valueOf(flight.getTotalSeats()));
@@ -394,6 +409,7 @@ public class FlightManagementPanel extends VBox {
         flightNumberField.clear();
         originField.clear();
         destinationField.clear();
+        airlineField.clear();
         departureDateField.clear();
         arrivalDateField.clear();
         totalSeatsField.clear();

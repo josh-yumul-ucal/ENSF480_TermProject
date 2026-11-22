@@ -40,14 +40,15 @@ public class FlightService {
     }
 
     /**
-     * Searches for flights based on a specified criteria such as origin, destination, and date.
+     * Searches for flights based on a specified criteria such as origin, destination, date and airline.
      * @param origin The departure airport code or the city name
      * @param destination The arrival airport code or the city name
      * @param date The departure date
+     * @param airline The airline to filter by
      * @return List of Flight objects that match the search criteria
      */
-    public List<Flight> searchFlights(String origin, String destination, java.util.Date date) {
-        return flightDAO.searchFlights(origin, destination, date);
+    public List<Flight> searchFlights(String origin, String destination, java.util.Date date, String airline) {
+        return flightDAO.searchFlights(origin, destination, date, airline);
     }
 
     /**

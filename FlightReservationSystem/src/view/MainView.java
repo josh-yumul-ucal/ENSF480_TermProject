@@ -112,7 +112,7 @@ public class MainView extends BorderPane {
      */
     public void showView() {
         primaryStage.setTitle("Flight Reservation System - " + currentUser.getRole() + " (" + currentUser.getUsername() + ")");
-        primaryStage.setScene(new javafx.scene.Scene(this, 1000, 700));
+        primaryStage.setScene(new javafx.scene.Scene(this, 1200, 700));
         primaryStage.show();
     }
 }
