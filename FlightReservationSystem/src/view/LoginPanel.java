@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -22,7 +23,7 @@ import javafx.stage.Stage;
  * Provides the authentication functionality for users to access the application.
  * Manages user credentials and redirects to the appropriate main views based on role.
  */
-public class LoginPanel extends VBox {
+public class LoginPanel extends BasePane {
     private MainController controller;
     private Stage primaryStage;
     private TextField usernameField;
@@ -70,7 +71,7 @@ public class LoginPanel extends VBox {
 
         VBox formBox = new VBox(10);
         formBox.getChildren().addAll(
-                new Label("Flight Reservation System - Login"),
+                new Label("ENSF480 Group 1 Flight Reservation System - Login"),
                 usernameField,
                 passwordField,
                 loginButton,
@@ -115,25 +116,12 @@ public class LoginPanel extends VBox {
     }
 
     /**
-     * Displays an alert dialog with the specified title and message.
-     * @param title The title of the dialog
-     * @param message The message of the dialog
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
      * Displays login interface to the user.
      * Sets up the stage and shows login panel.
      */
     public void show() {
-        primaryStage.setTitle("Flight Reservation System - Login");
-        primaryStage.setScene(new javafx.scene.Scene(this, 400, 250));
+        primaryStage.setTitle("ENSF480 Group 1 Flight Reservation System - Login");
+        primaryStage.setScene(new javafx.scene.Scene(this, 420, 250));
         primaryStage.show();
     }
 }

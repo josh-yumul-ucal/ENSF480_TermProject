@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -15,7 +16,7 @@ import java.util.Date;
 
 /**
  * Model class representing a flight reservation.
- * Tracks bookings, flight details, and reservation status.
+ * Tracks bookings, flight details.
  */
 public class Reservation {
     private final IntegerProperty reservationId;
@@ -24,7 +25,6 @@ public class Reservation {
     private final ObjectProperty<Date> bookingDate;
     private final IntegerProperty numberOfSeats;
     private final DoubleProperty totalAmount;
-    private final StringProperty status;
 
     /**
      * Default constructor for creating a new reservation object.
@@ -36,7 +36,6 @@ public class Reservation {
         this.bookingDate = new SimpleObjectProperty<>();
         this.numberOfSeats = new SimpleIntegerProperty();
         this.totalAmount = new SimpleDoubleProperty();
-        this.status = new SimpleStringProperty();
     }
 
     /**
@@ -47,17 +46,15 @@ public class Reservation {
      * @param bookingDate The date that the reservation was made
      * @param numberOfSeats The number of seats that were reserved
      * @param totalAmount The total cost of reservation
-     * @param status The status of the reservation (confirmed, cancelled, etc.)
      */
     public Reservation(int reservationId, int customerId, int flightId, Date bookingDate,
-                       int numberOfSeats, double totalAmount, String status) {
+                       int numberOfSeats, double totalAmount) {
         this.reservationId = new SimpleIntegerProperty(reservationId);
         this.customerId = new SimpleIntegerProperty(customerId);
         this.flightId = new SimpleIntegerProperty(flightId);
         this.bookingDate = new SimpleObjectProperty<>(bookingDate);
         this.numberOfSeats = new SimpleIntegerProperty(numberOfSeats);
         this.totalAmount = new SimpleDoubleProperty(totalAmount);
-        this.status = new SimpleStringProperty(status);
     }
 
     // Getters and Setters
@@ -169,22 +166,4 @@ public class Reservation {
      * @return The total amount property
      */
     public DoubleProperty totalAmountProperty() { return totalAmount; }
-
-    /**
-     * Gets the status of the reservation.
-     * @return The status (confirmed, cancelled, etc.)
-     */
-    public String getStatus() { return status.get(); }
-
-    /**
-     * Sets the status of the reservation.
-     * @param status The new status
-     */
-    public void setStatus(String status) { this.status.set(status); }
-
-    /**
-     * Gets JavaFX property for status.
-     * @return The status property
-     */
-    public StringProperty statusProperty() { return status; }
 }

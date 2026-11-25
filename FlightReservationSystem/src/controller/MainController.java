@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -31,10 +32,9 @@ public class MainController {
     private PaymentService paymentService;
     private UserService userService;
     private AircraftService aircraftService;
+    private PromotionService promotionService;
 
     private MainView mainView;
-
-    private User currentUser;
 
     /**
      * Initializes the MainController and sets up all necessary services.
@@ -47,7 +47,7 @@ public class MainController {
         this.paymentService = new PaymentService(dbManager);
         this.userService = new UserService(dbManager);
         this.aircraftService = new AircraftService(dbManager);
-        this.currentUser = null;
+        this.promotionService = new PromotionService(dbManager);
     }
 
     /**
@@ -75,9 +75,7 @@ public class MainController {
      * @param primaryStage The primary stage of the JavaFX application
      */
     public void showMainApplication(User user, Stage primaryStage) {
-        currentUser = user;
-
-        mainView = new MainView(this, primaryStage);
+        mainView = new MainView(this, user, primaryStage);
         mainView.showView();
     }
 
@@ -164,6 +162,15 @@ public class MainController {
     }
 
     /**
+     * Retrieves reservations for a specific flight ID.
+     * @param flightId The unique identifier of the flight
+     * @return The total number of reserved seats for the flight ID
+     */
+    public int getReservationsByFlightId(int flightId) {
+        return reservationService.getReservedSeatsForFlight(flightId);
+    }
+
+    /**
      * Creates a new reservation in the database.
      * Generates auto-incremented reservation_id after the insertion is successful.
      * @param reservation The Reservation object containing booking details
@@ -231,14 +238,6 @@ public class MainController {
      */
     public boolean deletePayment(int id) {
         return paymentService.deletePayment(id);
-    }
-
-    /**
-     * Gets the current user object
-     * @return currentUser The current user that has logged in
-     */
-    public User getCurrentUser() {
-        return currentUser;
     }
 
     /**
@@ -336,5 +335,42 @@ public class MainController {
      */
     public User getUserByUsername(String username) {
         return userService.getUserByUsername(username);
+    }
+
+    // Promotion operations
+
+    /**
+     * Retrieves the promotions from the database.
+     * @return The list of Promotion objects
+     */
+    public List<Promotion> getAllPromotions() {
+        return promotionService.getAllPromotions();
+    }
+
+    /**
+     * Creates a promotion record in the database.
+     * @param promotion The Promotion object containing the news information
+     * @return true If the promotion creation was successful, false otherwise
+     */
+    public boolean addPromotion(Promotion promotion) {
+        return promotionService.addPromotion(promotion);
+    }
+
+    /**
+     * Updates the promotion in the database.
+     * @param promotion The Promotion object containing the updated information
+     * @return true if promotion update was successful, false otherwise
+     */
+    public boolean updatePromotion(Promotion promotion) {
+        return promotionService.updatePromotion(promotion);
+    }
+
+    /**
+     * Deletes promotion record from the database.
+     * @param id The promotion ID to delete
+     * @return true If the promotion deletion was successful, false otherwise
+     */
+    public boolean deletePromotion(int id) {
+        return promotionService.deletePromotion(id);
     }
 }

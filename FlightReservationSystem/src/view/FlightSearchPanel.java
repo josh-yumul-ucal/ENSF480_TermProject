@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -25,7 +26,7 @@ import java.util.Date;
  * Provides a user interface for searching flights using origin, destination, date and airline criteria.
  * Displays the search results in a table format with flight information.
  */
-public class FlightSearchPanel extends VBox {
+public class FlightSearchPanel extends BasePane {
     private MainController controller;
     private TextField originField;
     private TextField destinationField;
@@ -91,22 +92,64 @@ public class FlightSearchPanel extends VBox {
         TableColumn<Flight, String> airlineColumn = new TableColumn<>("Airline");
         airlineColumn.setCellValueFactory(cellData -> cellData.getValue().airlineProperty());
 
-        TableColumn<Flight, Integer> aircraftIdColumn = new TableColumn<>("Aircraft ID");
-        aircraftIdColumn.setCellValueFactory(cellData -> cellData.getValue().aircraftIdProperty().asObject());
+        // Display aircraft name including model
+        TableColumn<Flight, String> aircraftColumn = new TableColumn<>("Aircraft");
+        aircraftColumn.setCellValueFactory(cellData -> {
+            Flight flight = cellData.getValue();
+            // Get the aircraft for this flight
+            try {
+                if (flight.getAircraft() != null) {
+                    return new javafx.beans.property.SimpleStringProperty(
+                            flight.getAircraft().getAircraftName() + " (" + flight.getAircraft().getModel() + ")"
+                    );
+                } else {
+                    // If we don't have the aircraft object, try to get it from controller
+                    var aircraft = controller.getAircraftById(flight.getAircraftId());
+                    if (aircraft != null) {
+                        return new javafx.beans.property.SimpleStringProperty(
+                                aircraft.getAircraftName() + " (" + aircraft.getModel() + ")"
+                        );
+                    }
+                }
+            } catch (Exception e) {
+                // If there's an error, show "Unknown Aircraft"
+                return new javafx.beans.property.SimpleStringProperty("Unknown Aircraft");
+            }
+            return new javafx.beans.property.SimpleStringProperty("No Aircraft Assigned");
+        });
+
+        // Calculate available seats based on total seats minus reserved seats
+        TableColumn<Flight, Integer> availableSeatsColumn = new TableColumn<>("Available Seats");
+        availableSeatsColumn.setCellValueFactory(cellData -> {
+            Flight flight = cellData.getValue();
+            int totalSeats = flight.getTotalSeats();
+
+            // Get the reservations for this flight and sum the number of seats
+            int reservedSeats = 0;
+            try {
+                List<model.Reservation> allReservations = controller.getAllReservations();
+                for (model.Reservation reservation : allReservations) {
+                    if (reservation.getFlightId() == flight.getFlightId()) {
+                        reservedSeats += reservation.getNumberOfSeats();
+                    }
+                }
+            } catch (Exception e) {
+                // If there's an error, default reserved seats to 0
+                reservedSeats = 0;
+            }
+
+            return new javafx.beans.property.SimpleIntegerProperty(totalSeats - reservedSeats).asObject();
+        });
 
         TableColumn<Flight, Integer> totalSeatsColumn = new TableColumn<>("Total Seats");
         totalSeatsColumn.setCellValueFactory(cellData -> cellData.getValue().totalSeatsProperty().asObject());
-
-        TableColumn<Flight, Integer> availableSeatsColumn = new TableColumn<>("Available Seats");
-        availableSeatsColumn.setCellValueFactory(cellData -> cellData.getValue().availableSeatsProperty().asObject());
 
         TableColumn<Flight, Double> priceColumn = new TableColumn<>("Price");
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
 
         flightTable.getColumns().addAll(idColumn, numberColumn, originColumn, destinationColumn,
                 departureColumn, arrivalColumn, airlineColumn,
-                aircraftIdColumn,
-                totalSeatsColumn, availableSeatsColumn, priceColumn);
+                aircraftColumn, availableSeatsColumn, totalSeatsColumn, priceColumn);
         flightTable.setItems(flightData);
     }
 
@@ -176,19 +219,5 @@ public class FlightSearchPanel extends VBox {
 
         // Add new data
         flightData.addAll(flights);
-    }
-
-    /**
-     * Displays an alert dialog with the specified title and message.
-     * Used for user feedback during error conditions or during success notifications.
-     * @param title The title of the dialog
-     * @param message The message of the dialog
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

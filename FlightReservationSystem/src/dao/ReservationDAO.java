@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -53,7 +54,6 @@ public class ReservationDAO {
                 reservation.setBookingDate(rs.getTimestamp("booking_date"));
                 reservation.setNumberOfSeats(rs.getInt("number_of_seats"));
                 reservation.setTotalAmount(rs.getDouble("total_amount"));
-                reservation.setStatus(rs.getString("status"));
                 reservations.add(reservation);
             }
         } catch (SQLException e) {
@@ -85,7 +85,6 @@ public class ReservationDAO {
                     reservation.setBookingDate(rs.getTimestamp("booking_date"));
                     reservation.setNumberOfSeats(rs.getInt("number_of_seats"));
                     reservation.setTotalAmount(rs.getDouble("total_amount"));
-                    reservation.setStatus(rs.getString("status"));
                     reservations.add(reservation);
                 }
             }
@@ -102,7 +101,7 @@ public class ReservationDAO {
      * @return true if reservation creation was successful, false otherwise
      */
     public boolean addReservation(Reservation reservation) {
-        String sql = "INSERT INTO reservations (customer_id, flight_id, booking_date, number_of_seats, total_amount, status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations (customer_id, flight_id, booking_date, number_of_seats, total_amount) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -112,7 +111,6 @@ public class ReservationDAO {
             stmt.setTimestamp(3, new Timestamp(reservation.getBookingDate().getTime()));
             stmt.setInt(4, reservation.getNumberOfSeats());
             stmt.setDouble(5, reservation.getTotalAmount());
-            stmt.setString(6, reservation.getStatus());
 
             boolean result = stmt.executeUpdate() > 0;
 
@@ -137,7 +135,7 @@ public class ReservationDAO {
      * @return true if the reservation update was successful, false otherwise
      */
     public boolean updateReservation(Reservation reservation) {
-        String sql = "UPDATE reservations SET customer_id = ?, flight_id = ?, booking_date = ?, number_of_seats = ?, total_amount = ?, status = ? WHERE reservation_id = ?";
+        String sql = "UPDATE reservations SET customer_id = ?, flight_id = ?, booking_date = ?, number_of_seats = ?, total_amount = ? WHERE reservation_id = ?";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -147,8 +145,7 @@ public class ReservationDAO {
             stmt.setTimestamp(3, new Timestamp(reservation.getBookingDate().getTime()));
             stmt.setInt(4, reservation.getNumberOfSeats());
             stmt.setDouble(5, reservation.getTotalAmount());
-            stmt.setString(6, reservation.getStatus());
-            stmt.setInt(7, reservation.getReservationId());
+            stmt.setInt(6, reservation.getReservationId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -184,7 +181,7 @@ public class ReservationDAO {
      * @return Total count of reserved seats for the flight
      */
     public int getReservedSeatsForFlight(int flightId) {
-        String sql = "SELECT SUM(number_of_seats) as total_reserved FROM reservations WHERE flight_id = ? AND status IN ('confirmed', 'booked')";
+        String sql = "SELECT SUM(number_of_seats) as total_reserved FROM reservations WHERE flight_id = ?";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

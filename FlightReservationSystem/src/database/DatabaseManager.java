@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -117,7 +118,6 @@ public class DatabaseManager {
                     booking_date TIMESTAMP NOT NULL,
                     number_of_seats INTEGER NOT NULL,
                     total_amount REAL NOT NULL,
-                    status TEXT NOT NULL,
                     FOREIGN KEY (customer_id) REFERENCES users (user_id),
                     FOREIGN KEY (flight_id) REFERENCES flights (flight_id)
                 )
@@ -136,12 +136,22 @@ public class DatabaseManager {
                 )
                 """;
 
+            // Create Promotions table
+            String createPromotionsTable = """
+                CREATE TABLE IF NOT EXISTS promotions (
+                    promotion_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    promotion_date TIMESTAMP NOT NULL,
+                    promotion_text TEXT NOT NULL
+                )
+                """;
+
             // Execute all table creation statements
             stmt.execute(createUserTable);
             stmt.execute(createAircraftTable);
             stmt.execute(createFlightsTable);
             stmt.execute(createReservationsTable);
             stmt.execute(createPaymentsTable);
+            stmt.execute(createPromotionsTable);
 
             // Insert initial admin user if not exists
             String checkAdminUser = "SELECT COUNT(*) FROM users WHERE username = 'admin'";

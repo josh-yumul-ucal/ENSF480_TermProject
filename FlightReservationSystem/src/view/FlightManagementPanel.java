@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -27,7 +28,7 @@ import java.text.SimpleDateFormat;
  * Provides a user interface for adding, updating, and deleting the flight records.
  * Displays the flight schedule in a table format with editable fields and aircraft selection.
  */
-public class FlightManagementPanel extends VBox {
+public class FlightManagementPanel extends BasePane {
     private MainController controller;
 
     private TextField flightNumberField;
@@ -134,8 +135,27 @@ public class FlightManagementPanel extends VBox {
         TableColumn<Flight, Date> arrivalColumn = new TableColumn<>("Arrival Time");
         arrivalColumn.setCellValueFactory(cellData -> cellData.getValue().arrivalTimeProperty());
 
-        TableColumn<Flight, Integer> aircraftIdColumn = new TableColumn<>("Aircraft ID");
-        aircraftIdColumn.setCellValueFactory(cellData -> cellData.getValue().aircraftIdProperty().asObject());
+        TableColumn<Flight, String> aircraftIdColumn = new TableColumn<>("Aircraft");
+        aircraftIdColumn.setCellValueFactory(cellData -> {
+            Flight flight = cellData.getValue();
+            Aircraft aircraft = null;
+
+            // Find the aircraft associated with this flight
+            for (Aircraft a : controller.getAllAircraft()) {
+                if (a.getAircraftId() == flight.getAircraftId()) {
+                    aircraft = a;
+                    break;
+                }
+            }
+
+            if (aircraft != null) {
+                return new javafx.beans.property.SimpleStringProperty(
+                        aircraft.getAircraftName() + " (" + aircraft.getModel() + ")"
+                );
+            } else {
+                return new javafx.beans.property.SimpleStringProperty("Unknown Aircraft (" + flight.getAircraftId() + ")");
+            }
+        });
 
         TableColumn<Flight, Integer> totalSeatsColumn = new TableColumn<>("Total Seats");
         totalSeatsColumn.setCellValueFactory(cellData -> cellData.getValue().totalSeatsProperty().asObject());
@@ -221,6 +241,13 @@ public class FlightManagementPanel extends VBox {
         flightTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 loadFlightData(newSelection);
+            }
+        });
+
+        // Add listener to the aircraft combo box to pre-populate the total seats field
+        aircraftComboBox.valueProperty().addListener((obs, oldAircraft, newAircraft) -> {
+            if (newAircraft != null && totalSeatsField.getText().isEmpty()) {
+                totalSeatsField.setText(String.valueOf(newAircraft.getCapacity()));
             }
         });
     }
@@ -415,32 +442,5 @@ public class FlightManagementPanel extends VBox {
         totalSeatsField.clear();
         priceField.clear();
         aircraftComboBox.setValue(null);
-    }
-
-    /**
-     * Displays an alert dialog with the specified title and message.
-     * @param title The title of the dialog
-     * @param message The message of the dialog
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
-     * Displays a confirmation dialog with the specified message.
-     * @param message The confirmation message
-     * @return true if user clicks OK, false otherwise
-     */
-    private boolean confirmAction(String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Action");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-
-        return alert.showAndWait().filter(response -> response == ButtonType.OK).isPresent();
     }
 }

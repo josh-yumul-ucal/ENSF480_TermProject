@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -23,7 +24,7 @@ import java.util.List;
  * User interface view component for adding, updating and deleting aircraft records.
  * Displays aircraft in a table format with editable fields.
  */
-public class AircraftManagementPanel extends VBox {
+public class AircraftManagementPanel extends BasePane {
     private MainController controller;
 
     private TextField aircraftNameField;
@@ -264,32 +265,5 @@ public class AircraftManagementPanel extends VBox {
         aircraftNameField.clear();
         modelField.clear();
         capacityField.clear();
-    }
-
-    /**
-     * Displays an alert dialog with the specified title and message.
-     * @param title The title for the dialog
-     * @param message The message for the dialog
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
-     * Displays a confirmation dialog with the specified message.
-     * @param message The confirmation message
-     * @return true if user clicks OK, false otherwise
-     */
-    private boolean confirmAction(String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Action");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-
-        return alert.showAndWait().filter(response -> response == ButtonType.OK).isPresent();
     }
 }

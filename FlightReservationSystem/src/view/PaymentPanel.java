@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -27,7 +28,7 @@ import java.text.SimpleDateFormat;
  * Provides a user interface for viewing, adding, and managing the payment records.
  * Displays the transaction details including reservation associations and payment methods.
  */
-public class PaymentPanel extends VBox {
+public class PaymentPanel extends BasePane {
     private MainController controller;
 
     private ComboBox<Reservation> reservationComboBox;
@@ -70,7 +71,7 @@ public class PaymentPanel extends VBox {
             @Override
             public String toString(Reservation reservation) {
                 if (reservation == null) return "";
-                return "Customer_" + reservation.getCustomerId() + " (" + reservation.getReservationId() + ")";
+                return String.valueOf(reservation.getReservationId());
             }
 
             @Override
@@ -134,7 +135,7 @@ public class PaymentPanel extends VBox {
         inputPanel.setHgap(10);
         inputPanel.setVgap(10);
 
-        inputPanel.add(new Label("Reservation:"), 0, 0);
+        inputPanel.add(new Label("Reservation ID:"), 0, 0);
         inputPanel.add(reservationComboBox, 1, 0);
 
         inputPanel.add(new Label("Payment Date (YYYY-MM-DD HH:MM):"), 0, 1);
@@ -336,32 +337,5 @@ public class PaymentPanel extends VBox {
         amountField.clear();
         methodField.clear();
         transactionIdField.clear();
-    }
-
-    /**
-     * Displays an alert dialog with the specified title and message.
-     * @param title The title of the dialog
-     * @param message The message of the dialog
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
-     * Displays a confirmation dialog with the provided message.
-     * @param message The message to the user
-     * @return true if the user clicks OK, false otherwise
-     */
-    private boolean confirmAction(String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Action");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-
-        return alert.showAndWait().filter(response -> response == ButtonType.OK).isPresent();
     }
 }

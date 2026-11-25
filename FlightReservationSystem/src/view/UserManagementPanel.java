@@ -1,5 +1,6 @@
 /**
- * ENSF480 Final Project: Flight Management System
+ * ENSF480 Group 1
+ * Final Project: Flight Management System
  * Due Date: November 30, 2026 at 2PM MT
  * Project Members:
  *      Tyler Birkbeck
@@ -18,14 +19,13 @@ import javafx.scene.layout.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.List;
-import java.util.Date;
 
 /**
  * View component for user management.
  * Provides a user interface for adding, updating, and deleting the user accounts.
  * Supports role-based access control with different permissions for each type of user.
  */
-public class UserManagementPanel extends VBox {
+public class UserManagementPanel extends BasePane {
     private MainController controller;
 
     private TextField usernameField;
@@ -307,32 +307,5 @@ public class UserManagementPanel extends VBox {
         firstNameField.clear();
         lastNameField.clear();
         emailField.clear();
-    }
-
-    /**
-     * Displays an alert dialog with specified title and message.
-     * @param title The title of the dialog
-     * @param message The message of the dialog
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    /**
-     * Displays a confirmation dialog with the specified message.
-     * @param message The confirmation message
-     * @return true if user clicks OK, false otherwise
-     */
-    private boolean confirmAction(String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirm Action");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-
-        return alert.showAndWait().filter(response -> response == ButtonType.OK).isPresent();
     }
 }
