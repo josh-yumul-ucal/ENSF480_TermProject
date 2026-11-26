@@ -32,7 +32,7 @@ public class PromotionPanel extends BasePane {
     private User currentUser;
     private boolean isEditable;
 
-    private DatePicker dateField;
+    private TextField dateField;
     private TextArea textArea;
     private Button addButton;
     private Button updateButton;
@@ -60,8 +60,8 @@ public class PromotionPanel extends BasePane {
      * Sets up the text fields, buttons, and table with column definitions.
      */
     private void initializeComponents() {
-        dateField = new DatePicker();
-        dateField.setPromptText("Date (YYYY-MM-DD)");
+        dateField = new TextField();
+        dateField.setPromptText("Date (YYYY-MM)");
 
         textArea = new TextArea();
         textArea.setPromptText("Promotion Text");
@@ -76,8 +76,16 @@ public class PromotionPanel extends BasePane {
         promotionTable = new TableView<>();
 
         // Create columns
-        TableColumn<Promotion, Date> dateColumn = new TableColumn<>("Date");
-        dateColumn.setCellValueFactory(cellData -> cellData.getValue().promotionDateProperty());
+        TableColumn<Promotion, String> dateColumn = new TableColumn<>("Date");
+        dateColumn.setCellValueFactory(cellData -> {
+            Date date = cellData.getValue().getPromotionDate();
+            if (date != null) {
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+                return new javafx.beans.property.SimpleStringProperty(sdf.format(date));
+            } else {
+                return new javafx.beans.property.SimpleStringProperty("");
+            }
+        });
 
         TableColumn<Promotion, String> textColumn = new TableColumn<>("Promotion Text");
         textColumn.setCellValueFactory(cellData -> cellData.getValue().promotionTextProperty());
@@ -100,7 +108,7 @@ public class PromotionPanel extends BasePane {
         inputPanel.setHgap(10);
         inputPanel.setVgap(10);
 
-        inputPanel.add(new Label("Date (YYYY-MM-DD):"), 0, 0);
+        inputPanel.add(new Label("Date (YYYY-MM):"), 0, 0);
         inputPanel.add(dateField, 1, 0);
 
         inputPanel.add(new Label("Promotion Text:"), 0, 1);
@@ -237,18 +245,26 @@ public class PromotionPanel extends BasePane {
      * @return Promotion object If the validation passes, null otherwise
      */
     private Promotion createPromotionFromInput() {
-        java.time.LocalDate localDate = dateField.getValue();
+        String dateString = dateField.getText().trim();
         String text = textArea.getText().trim();
 
-        if (localDate == null || text.isEmpty()) {
+        if (dateString.isEmpty() || text.isEmpty()) {
             showAlert("Error", "Please fill in all required fields");
             return null;
         }
 
         try {
-            // Convert LocalDate to Date
+            // Validate the date format (YYYY-MM)
+            if (!dateString.matches("\\d{4}-\\d{2}")) {
+                showAlert("Error", "Date must be in YYYY-MM format");
+                return null;
+            }
+
+            // Assume day is the first of the month
+            String fullDateString = dateString + "-01";
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = sdf.parse(localDate.toString());
+            Date date = sdf.parse(fullDateString);
 
             Promotion promotion = new Promotion();
             promotion.setPromotionDate(date);
@@ -256,7 +272,7 @@ public class PromotionPanel extends BasePane {
 
             return promotion;
         } catch (Exception e) {
-            showAlert("Error", "Please enter a valid date in YYYY-MM-DD format");
+            showAlert("Error", "Please enter a valid date in YYYY-MM format");
             return null;
         }
     }
@@ -266,18 +282,20 @@ public class PromotionPanel extends BasePane {
      * @param promotion The Promotion object to load data from
      */
     private void loadPromotionData(Promotion promotion) {
-        // Convert Date to LocalDate for DatePicker
+        // Convert Date to string in YYYY-MM format
         java.util.Date date = promotion.getPromotionDate();
         if (date != null) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             try {
-                java.time.LocalDate localDate = java.time.LocalDate.parse(sdf.format(date));
-                dateField.setValue(localDate);
+                String dateString = sdf.format(date);
+                // Extract year and month part (first 7 characters)
+                String formattedDate = dateString.substring(0, 7);
+                dateField.setText(formattedDate);
             } catch (Exception e) {
-                dateField.setValue(null);
+                dateField.setText("");
             }
         } else {
-            dateField.setValue(null);
+            dateField.setText("");
         }
         textArea.setText(promotion.getPromotionText());
     }
@@ -287,7 +305,7 @@ public class PromotionPanel extends BasePane {
      * Used after the successful addition or when resetting the form.
      */
     private void clearInputFields() {
-        dateField.setValue(null);
+        dateField.clear();
         textArea.clear();
     }
 }

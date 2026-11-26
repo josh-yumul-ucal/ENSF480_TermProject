@@ -22,7 +22,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.List;
 import java.util.Date;
+import java.util.Random;
 import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 
@@ -34,12 +36,14 @@ import javafx.scene.Scene;
 public class ReservationManagementPanel extends BasePane {
     private MainController controller;
     private User currentUser;
+    private Random random = new Random();
 
     private ComboBox<User> customerIdComboBox;
     private ComboBox<Flight> flightComboBox;
-    private TextField bookingDateField; // Using text field for date input
+    private TextField bookingDateField;
     private TextField seatsField;
     private TextField amountField;
+    private ComboBox<String> paymentMethodComboBox;
     private Button addButton;
     private Button updateButton;
     private Button deleteButton;
@@ -112,6 +116,17 @@ public class ReservationManagementPanel extends BasePane {
 
         amountField = new TextField();
         amountField.setPromptText("Amount");
+        amountField.setEditable(false);
+        amountField.setStyle("-fx-background-color: #e0e0e0;");
+
+        // Create a payment method dropdown with "VISA" and "Mastercard" options
+        ObservableList<String> paymentMethods = FXCollections.observableArrayList(
+                "VISA",
+                "Mastercard"
+        );
+        paymentMethodComboBox = new ComboBox<>(paymentMethods);
+        paymentMethodComboBox.setPromptText("Select Payment Method");
+        paymentMethodComboBox.getSelectionModel().selectFirst();
 
         addButton = new Button("Add Reservation");
         updateButton = new Button("Update Reservation");
@@ -123,8 +138,13 @@ public class ReservationManagementPanel extends BasePane {
         reservationTable = new TableView<>();
 
         // Create columns
-        TableColumn<Reservation, Integer> reservationIdColumn = new TableColumn<>("Reservation ID");
-        reservationIdColumn.setCellValueFactory(cellData -> cellData.getValue().reservationIdProperty().asObject());
+        TableColumn<Reservation, String> reservationIdColumn = new TableColumn<>("Reservation ID");
+        reservationIdColumn.setCellValueFactory(cellData -> {
+            Reservation reservation = cellData.getValue();
+            // Generate a reservation reference by adding the reference ID to 1000000
+            int displayId = reservation.getReservationId() + 1000000;
+            return new javafx.beans.property.SimpleStringProperty(String.valueOf(displayId));
+        });
 
         TableColumn<Reservation, String> customerIdColumn = new TableColumn<>("Customer");
         customerIdColumn.setCellValueFactory(cellData -> {
@@ -179,6 +199,20 @@ public class ReservationManagementPanel extends BasePane {
         TableColumn<Reservation, Double> amountColumn = new TableColumn<>("Amount");
         amountColumn.setCellValueFactory(cellData -> cellData.getValue().totalAmountProperty().asObject());
 
+        amountColumn.setCellFactory(column -> new TableCell<Reservation, Double>() {
+            private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(currencyFormatter.format(item));
+                }
+            }
+        });
+
         reservationTable.getColumns().addAll(reservationIdColumn, customerIdColumn, flightIdColumn, bookingDateColumn,
                 seatsColumn, amountColumn);
         reservationTable.setItems(reservationData);
@@ -210,8 +244,11 @@ public class ReservationManagementPanel extends BasePane {
         inputPanel.add(new Label("Seats:"), 0, 3);
         inputPanel.add(seatsField, 1, 3);
 
-        inputPanel.add(new Label("Amount:"), 0, 4);
+        inputPanel.add(new Label("Amount ($):"), 0, 4);
         inputPanel.add(amountField, 1, 4);
+
+        inputPanel.add(new Label("Payment Method:"), 0, 5);
+        inputPanel.add(paymentMethodComboBox, 1, 5);
 
         HBox buttonBox = new HBox(10);
         buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton, generateConfirmationButton);
@@ -252,18 +289,20 @@ public class ReservationManagementPanel extends BasePane {
         flightComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateConfirmationButtonState());
         bookingDateField.textProperty().addListener((obs, oldVal, newVal) -> updateConfirmationButtonState());
         seatsField.textProperty().addListener((obs, oldVal, newVal) -> updateConfirmationButtonState());
-        amountField.textProperty().addListener((obs, oldVal, newVal) -> updateConfirmationButtonState());
+        paymentMethodComboBox.valueProperty().addListener((obs, oldVal, newVal) -> updateConfirmationButtonState());
 
-        // Add a listener to the seats field to validate the value
+        // Add a listener to the seats field to validate the value and calculate the amount
         seatsField.textProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.isEmpty() && flightComboBox.getValue() != null) {
+                calculateAmount();
                 validateSeatAvailability();
             }
         });
 
-        // Add a listener to the flight selection to validate the value
+        // Add a listener to the flight selection to calculate the amount when flight changes
         flightComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !seatsField.getText().isEmpty()) {
+                calculateAmount();
                 validateSeatAvailability();
             }
         });
@@ -277,7 +316,7 @@ public class ReservationManagementPanel extends BasePane {
                 flightComboBox.getValue() != null &&
                 !bookingDateField.getText().trim().isEmpty() &&
                 !seatsField.getText().trim().isEmpty() &&
-                !amountField.getText().trim().isEmpty();
+                paymentMethodComboBox.getValue() != null;
 
         generateConfirmationButton.setDisable(!hasData);
     }
@@ -296,6 +335,11 @@ public class ReservationManagementPanel extends BasePane {
      * Validates the input and refreshes the table display after successful creation.
      */
     private void addReservation() {
+        // Validate that the booking date is not after flight departure date
+        if (!validateBookingDate()) {
+            return;
+        }
+
         // Validate seats are available before proceeding
         if (!validateSeatAvailability()) {
             return;
@@ -319,6 +363,11 @@ public class ReservationManagementPanel extends BasePane {
      * Uses selected item reference to preserve ID during the update operation.
      */
     private void updateReservation() {
+        // Validate that the booking date is not after flight departure date
+        if (!validateBookingDate()) {
+            return;
+        }
+
         // Validate seats are available before proceeding
         if (!validateSeatAvailability()) {
             return;
@@ -364,6 +413,35 @@ public class ReservationManagementPanel extends BasePane {
             } else {
                 showAlert("Error", "Failed to delete reservation");
             }
+        }
+    }
+
+    /**
+     * Validates that the booking date is not after flight departure date
+     * @return true If the validation passes, false otherwise
+     */
+    private boolean validateBookingDate() {
+        Flight selectedFlight = flightComboBox.getValue();
+        String bookingDateStr = bookingDateField.getText().trim();
+
+        if (selectedFlight == null || bookingDateStr.isEmpty()) {
+            return true;
+        }
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            Date bookingDate = sdf.parse(bookingDateStr);
+            Date departureDate = selectedFlight.getDepartureTime();
+
+            if (bookingDate.after(departureDate)) {
+                showAlert("Date Error", "Booking date cannot be after flight departure date!");
+                return false;
+            }
+
+            return true;
+        } catch (Exception e) {
+            showAlert("Date Error", "Invalid date format. Use YYYY-MM-DD HH:MM");
+            return false;
         }
     }
 
@@ -420,10 +498,12 @@ public class ReservationManagementPanel extends BasePane {
         }
 
         // Handle the case where we're showing a new reservation that hasn't been saved yet
+        int displayReservationId = 0;
         if (reservation.getReservationId() == 0) {
             reportContent.append("Reservation ID: NEW - Will be generated after saving\n");
         } else {
-            reportContent.append("Reservation ID: ").append(reservation.getReservationId()).append("\n");
+            displayReservationId = reservation.getReservationId() + 1000000;
+            reportContent.append("Reservation ID: ").append(displayReservationId).append("\n");
         }
 
         reportContent.append("Customer: ").append(customer != null ? customer.getFirstName() + " " + customer.getLastName() : "Unknown").append("\n");
@@ -432,7 +512,8 @@ public class ReservationManagementPanel extends BasePane {
         reportContent.append("Destination: ").append(flight != null ? flight.getDestination() : "Unknown").append("\n");
         reportContent.append("Departure Date: ").append(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(reservation.getBookingDate())).append("\n");
         reportContent.append("Number of Seats: ").append(reservation.getNumberOfSeats()).append("\n");
-        reportContent.append("Total Amount: $").append(String.format("%.2f", reservation.getTotalAmount())).append("\n");
+        reportContent.append("Total Amount: ").append(NumberFormat.getCurrencyInstance().format(reservation.getTotalAmount())).append("\n");
+        reportContent.append("Payment Method: ").append(reservation.getPaymentMethod()).append("\n"); // Using the property directly
         reportContent.append("=====================================\n");
 
         // Create the report window
@@ -495,6 +576,24 @@ public class ReservationManagementPanel extends BasePane {
     }
 
     /**
+     * Calculates the total amount using the flight price and the number of seats
+     */
+    private void calculateAmount() {
+        Flight selectedFlight = flightComboBox.getValue();
+        String seatsStr = seatsField.getText().trim();
+
+        if (selectedFlight != null && !seatsStr.isEmpty()) {
+            try {
+                int numberOfSeats = Integer.parseInt(seatsStr);
+                double totalAmount = selectedFlight.getPrice() * numberOfSeats;
+                amountField.setText(String.valueOf(totalAmount));
+            } catch (NumberFormatException e) {
+                // Do nothing since invalid input will be handled elsewhere
+            }
+        }
+    }
+
+    /**
      * Refreshes the reservation table.
      * This ensures that the auto-generated IDs are properly loaded after record creation.
      */
@@ -542,6 +641,7 @@ public class ReservationManagementPanel extends BasePane {
         String bookingDateStr = bookingDateField.getText().trim();
         String seatsStr = seatsField.getText().trim();
         String amountStr = amountField.getText().trim();
+        String paymentMethod = paymentMethodComboBox.getValue();
 
         if (selectedUser == null || selectedFlight == null || bookingDateStr.isEmpty() ||
                 seatsStr.isEmpty() || amountStr.isEmpty()) {
@@ -562,6 +662,8 @@ public class ReservationManagementPanel extends BasePane {
             reservation.setBookingDate(bookingDate);
             reservation.setNumberOfSeats(seats);
             reservation.setTotalAmount(amount);
+            reservation.setPaymentMethod(paymentMethod);
+            // Note: transactionId is not set here, it is generated by the database
 
             return reservation;
         } catch (Exception e) {
@@ -603,6 +705,7 @@ public class ReservationManagementPanel extends BasePane {
         bookingDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(reservation.getBookingDate()));
         seatsField.setText(String.valueOf(reservation.getNumberOfSeats()));
         amountField.setText(String.valueOf(reservation.getTotalAmount()));
+        paymentMethodComboBox.setValue(reservation.getPaymentMethod());
     }
 
     /**
@@ -615,6 +718,7 @@ public class ReservationManagementPanel extends BasePane {
         bookingDateField.clear();
         seatsField.clear();
         amountField.clear();
+        paymentMethodComboBox.getSelectionModel().selectFirst();
         updateConfirmationButtonState();
     }
 }

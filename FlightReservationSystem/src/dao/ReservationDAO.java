@@ -54,6 +54,8 @@ public class ReservationDAO {
                 reservation.setBookingDate(rs.getTimestamp("booking_date"));
                 reservation.setNumberOfSeats(rs.getInt("number_of_seats"));
                 reservation.setTotalAmount(rs.getDouble("total_amount"));
+                reservation.setPaymentMethod(rs.getString("payment_method"));
+                reservation.setTransactionId(rs.getString("transaction_id"));
                 reservations.add(reservation);
             }
         } catch (SQLException e) {
@@ -85,6 +87,8 @@ public class ReservationDAO {
                     reservation.setBookingDate(rs.getTimestamp("booking_date"));
                     reservation.setNumberOfSeats(rs.getInt("number_of_seats"));
                     reservation.setTotalAmount(rs.getDouble("total_amount"));
+                    reservation.setPaymentMethod(rs.getString("payment_method"));
+                    reservation.setTransactionId(rs.getString("transaction_id"));
                     reservations.add(reservation);
                 }
             }
@@ -101,7 +105,7 @@ public class ReservationDAO {
      * @return true if reservation creation was successful, false otherwise
      */
     public boolean addReservation(Reservation reservation) {
-        String sql = "INSERT INTO reservations (customer_id, flight_id, booking_date, number_of_seats, total_amount) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO reservations (customer_id, flight_id, booking_date, number_of_seats, total_amount, payment_method, transaction_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -111,6 +115,8 @@ public class ReservationDAO {
             stmt.setTimestamp(3, new Timestamp(reservation.getBookingDate().getTime()));
             stmt.setInt(4, reservation.getNumberOfSeats());
             stmt.setDouble(5, reservation.getTotalAmount());
+            stmt.setString(6, reservation.getPaymentMethod());
+            stmt.setString(7, reservation.getTransactionId());
 
             boolean result = stmt.executeUpdate() > 0;
 
@@ -135,7 +141,7 @@ public class ReservationDAO {
      * @return true if the reservation update was successful, false otherwise
      */
     public boolean updateReservation(Reservation reservation) {
-        String sql = "UPDATE reservations SET customer_id = ?, flight_id = ?, booking_date = ?, number_of_seats = ?, total_amount = ? WHERE reservation_id = ?";
+        String sql = "UPDATE reservations SET customer_id = ?, flight_id = ?, booking_date = ?, number_of_seats = ?, total_amount = ?, payment_method = ?, transaction_id = ? WHERE reservation_id = ?";
 
         try (Connection conn = dbManager.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -145,7 +151,9 @@ public class ReservationDAO {
             stmt.setTimestamp(3, new Timestamp(reservation.getBookingDate().getTime()));
             stmt.setInt(4, reservation.getNumberOfSeats());
             stmt.setDouble(5, reservation.getTotalAmount());
-            stmt.setInt(6, reservation.getReservationId());
+            stmt.setString(6, reservation.getPaymentMethod());
+            stmt.setString(7, reservation.getTransactionId());
+            stmt.setInt(8, reservation.getReservationId());
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

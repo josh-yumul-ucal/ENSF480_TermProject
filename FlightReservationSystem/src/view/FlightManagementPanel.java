@@ -22,6 +22,7 @@ import javafx.collections.ObservableList;
 import java.util.List;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
 
 /**
  * View component for flight management.
@@ -163,6 +164,21 @@ public class FlightManagementPanel extends BasePane {
         TableColumn<Flight, Double> priceColumn = new TableColumn<>("Price");
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
 
+        priceColumn.setCellFactory(column -> new TableCell<Flight, Double>() {
+            private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    // Format as currency with exactly 2 decimal places
+                    setText(currencyFormatter.format(item));
+                }
+            }
+        });
+
         flightTable.getColumns().addAll(numberColumn, originColumn, destinationColumn,
                 airlineColumn,
                 departureColumn, arrivalColumn, aircraftIdColumn,
@@ -205,7 +221,7 @@ public class FlightManagementPanel extends BasePane {
         inputPanel.add(new Label("Total Seats:"), 0, 6);
         inputPanel.add(totalSeatsField, 1, 6);
 
-        inputPanel.add(new Label("Price:"), 0, 7);
+        inputPanel.add(new Label("Price ($):"), 0, 7);
         inputPanel.add(priceField, 1, 7);
 
         inputPanel.add(new Label("Aircraft:"), 0, 8);
@@ -248,6 +264,23 @@ public class FlightManagementPanel extends BasePane {
         aircraftComboBox.valueProperty().addListener((obs, oldAircraft, newAircraft) -> {
             if (newAircraft != null && totalSeatsField.getText().isEmpty()) {
                 totalSeatsField.setText(String.valueOf(newAircraft.getCapacity()));
+            }
+        });
+
+        // Format the price field when the value changes
+        priceField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null && !newValue.isEmpty()) {
+                try {
+                    double value = Double.parseDouble(newValue);
+                    NumberFormat formatter = NumberFormat.getCurrencyInstance();
+                    String formatted = formatter.format(value);
+
+                    if (!formatted.equals(priceField.getText())) {
+                        priceField.setText(formatted);
+                    }
+                } catch (NumberFormatException e) {
+                    // If the price is not a valid number, keep as is
+                }
             }
         });
     }
@@ -358,7 +391,8 @@ public class FlightManagementPanel extends BasePane {
 
         try {
             int totalSeats = Integer.parseInt(totalSeatsStr);
-            double price = Double.parseDouble(priceStr);
+
+            double price = Double.parseDouble(priceStr.replaceAll("[^0-9.]", ""));
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Date departureDate = sdf.parse(departureDateStr);
@@ -400,7 +434,10 @@ public class FlightManagementPanel extends BasePane {
         departureDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(flight.getDepartureTime()));
         arrivalDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(flight.getArrivalTime()));
         totalSeatsField.setText(String.valueOf(flight.getTotalSeats()));
-        priceField.setText(String.valueOf(flight.getPrice()));
+
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+        String formattedPrice = formatter.format(flight.getPrice());
+        priceField.setText(formattedPrice);
 
         // Set aircraft in dropdown if exists
         if (flight.getAircraft() != null) {

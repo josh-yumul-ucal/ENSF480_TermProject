@@ -118,21 +118,10 @@ public class DatabaseManager {
                     booking_date TIMESTAMP NOT NULL,
                     number_of_seats INTEGER NOT NULL,
                     total_amount REAL NOT NULL,
+                    payment_method TEXT,
+                    transaction_id TEXT,
                     FOREIGN KEY (customer_id) REFERENCES users (user_id),
                     FOREIGN KEY (flight_id) REFERENCES flights (flight_id)
-                )
-                """;
-
-            // Create Payments table
-            String createPaymentsTable = """
-                CREATE TABLE IF NOT EXISTS payments (
-                    payment_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    reservation_id INTEGER NOT NULL,
-                    payment_date TIMESTAMP NOT NULL,
-                    amount REAL NOT NULL,
-                    payment_method TEXT NOT NULL,
-                    transaction_id TEXT UNIQUE NOT NULL,
-                    FOREIGN KEY (reservation_id) REFERENCES reservations (reservation_id)
                 )
                 """;
 
@@ -150,7 +139,6 @@ public class DatabaseManager {
             stmt.execute(createAircraftTable);
             stmt.execute(createFlightsTable);
             stmt.execute(createReservationsTable);
-            stmt.execute(createPaymentsTable);
             stmt.execute(createPromotionsTable);
 
             // Insert initial admin user if not exists

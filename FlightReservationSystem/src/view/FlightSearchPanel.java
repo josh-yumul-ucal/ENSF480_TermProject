@@ -20,6 +20,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.List;
 import java.util.Date;
+import java.text.NumberFormat;
 
 /**
  * View component for flight search.
@@ -71,10 +72,7 @@ public class FlightSearchPanel extends BasePane {
         flightTable = new TableView<>();
 
         // Create columns
-        TableColumn<Flight, Integer> idColumn = new TableColumn<>("Flight ID");
-        idColumn.setCellValueFactory(cellData -> cellData.getValue().flightIdProperty().asObject());
-
-        TableColumn<Flight, String> numberColumn = new TableColumn<>("Number");
+        TableColumn<Flight, String> numberColumn = new TableColumn<>("Flight Number");
         numberColumn.setCellValueFactory(cellData -> cellData.getValue().flightNumberProperty());
 
         TableColumn<Flight, String> originColumn = new TableColumn<>("Origin");
@@ -88,6 +86,22 @@ public class FlightSearchPanel extends BasePane {
 
         TableColumn<Flight, Date> arrivalColumn = new TableColumn<>("Arrival Time");
         arrivalColumn.setCellValueFactory(cellData -> cellData.getValue().arrivalTimeProperty());
+
+        TableColumn<Flight, String> durationColumn = new TableColumn<>("Flight Duration");
+        durationColumn.setCellValueFactory(cellData -> {
+            Flight flight = cellData.getValue();
+            Date departureTime = flight.getDepartureTime();
+            Date arrivalTime = flight.getArrivalTime();
+
+            if (departureTime != null && arrivalTime != null) {
+                long diffInMillis = arrivalTime.getTime() - departureTime.getTime();
+                long hours = diffInMillis / (1000 * 60 * 60);
+                long minutes = (diffInMillis % (1000 * 60 * 60)) / (1000 * 60);
+                return new javafx.beans.property.SimpleStringProperty(String.format("%02d:%02d", hours, minutes));
+            } else {
+                return new javafx.beans.property.SimpleStringProperty("N/A");
+            }
+        });
 
         TableColumn<Flight, String> airlineColumn = new TableColumn<>("Airline");
         airlineColumn.setCellValueFactory(cellData -> cellData.getValue().airlineProperty());
@@ -147,8 +161,22 @@ public class FlightSearchPanel extends BasePane {
         TableColumn<Flight, Double> priceColumn = new TableColumn<>("Price");
         priceColumn.setCellValueFactory(cellData -> cellData.getValue().priceProperty().asObject());
 
-        flightTable.getColumns().addAll(idColumn, numberColumn, originColumn, destinationColumn,
-                departureColumn, arrivalColumn, airlineColumn,
+        priceColumn.setCellFactory(column -> new TableCell<Flight, Double>() {
+            private final NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(currencyFormatter.format(item));
+                }
+            }
+        });
+
+        flightTable.getColumns().addAll(numberColumn, originColumn, destinationColumn,
+                departureColumn, arrivalColumn, durationColumn, airlineColumn,
                 aircraftColumn, availableSeatsColumn, totalSeatsColumn, priceColumn);
         flightTable.setItems(flightData);
     }

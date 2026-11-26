@@ -25,6 +25,8 @@ public class Reservation {
     private final ObjectProperty<Date> bookingDate;
     private final IntegerProperty numberOfSeats;
     private final DoubleProperty totalAmount;
+    private final StringProperty paymentMethod;
+    private final StringProperty transactionId;
 
     /**
      * Default constructor for creating a new reservation object.
@@ -36,6 +38,8 @@ public class Reservation {
         this.bookingDate = new SimpleObjectProperty<>();
         this.numberOfSeats = new SimpleIntegerProperty();
         this.totalAmount = new SimpleDoubleProperty();
+        this.paymentMethod = new SimpleStringProperty();
+        this.transactionId = new SimpleStringProperty();
     }
 
     /**
@@ -46,18 +50,20 @@ public class Reservation {
      * @param bookingDate The date that the reservation was made
      * @param numberOfSeats The number of seats that were reserved
      * @param totalAmount The total cost of reservation
+     * @param paymentMethod The payment method used
+     * @param transactionId The transaction identifier
      */
     public Reservation(int reservationId, int customerId, int flightId, Date bookingDate,
-                       int numberOfSeats, double totalAmount) {
+                       int numberOfSeats, double totalAmount, String paymentMethod, String transactionId) {
         this.reservationId = new SimpleIntegerProperty(reservationId);
         this.customerId = new SimpleIntegerProperty(customerId);
         this.flightId = new SimpleIntegerProperty(flightId);
         this.bookingDate = new SimpleObjectProperty<>(bookingDate);
         this.numberOfSeats = new SimpleIntegerProperty(numberOfSeats);
         this.totalAmount = new SimpleDoubleProperty(totalAmount);
+        this.paymentMethod = new SimpleStringProperty(paymentMethod);
+        this.transactionId = new SimpleStringProperty(transactionId);
     }
-
-    // Getters and Setters
 
     /**
      * Gets the unique identifier for the reservation.
@@ -166,4 +172,40 @@ public class Reservation {
      * @return The total amount property
      */
     public DoubleProperty totalAmountProperty() { return totalAmount; }
+
+    /**
+     * Gets the payment method used for the reservation.
+     * @return The payment method
+     */
+    public String getPaymentMethod() { return paymentMethod.get(); }
+
+    /**
+     * Sets the payment method used for the reservation.
+     * @param paymentMethod The new payment method
+     */
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod.set(paymentMethod); }
+
+    /**
+     * Gets the JavaFX property for payment method.
+     * @return The payment method property
+     */
+    public StringProperty paymentMethodProperty() { return paymentMethod; }
+
+    /**
+     * Gets the transaction ID for the reservation.
+     * @return The transaction ID
+     */
+    public String getTransactionId() { return transactionId.get(); }
+
+    /**
+     * Sets the transaction ID for the reservation.
+     * @param transactionId The new transaction ID
+     */
+    public void setTransactionId(String transactionId) { this.transactionId.set(transactionId); }
+
+    /**
+     * Gets the JavaFX property for transaction ID.
+     * @return The transaction ID property
+     */
+    public StringProperty transactionIdProperty() { return transactionId; }
 }

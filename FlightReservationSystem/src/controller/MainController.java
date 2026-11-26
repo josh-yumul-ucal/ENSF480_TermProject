@@ -29,7 +29,6 @@ public class MainController {
     private DatabaseManager dbManager;
     private FlightService flightService;
     private ReservationService reservationService;
-    private PaymentService paymentService;
     private UserService userService;
     private AircraftService aircraftService;
     private PromotionService promotionService;
@@ -44,7 +43,6 @@ public class MainController {
         this.dbManager = DatabaseManager.getInstance();
         this.flightService = new FlightService(dbManager);
         this.reservationService = new ReservationService(dbManager);
-        this.paymentService = new PaymentService(dbManager);
         this.userService = new UserService(dbManager);
         this.aircraftService = new AircraftService(dbManager);
         this.promotionService = new PromotionService(dbManager);
@@ -197,47 +195,6 @@ public class MainController {
      */
     public boolean deleteReservation(int id) {
         return reservationService.deleteReservation(id);
-    }
-
-    // Payment operations
-
-    /**
-     * Retrieves all payment information from the database.
-     * Used in payment management panels to display complete transaction history.
-     * @return List of all Payment objects
-     */
-    public List<Payment> getAllPayments() {
-        return paymentService.getAllPayments();
-    }
-
-    /**
-     * Creates a new payment record in the database.
-     * This method links payments to reservations and updates transaction details.
-     * @param payment The Payment object containing transaction information
-     * @return true if payment was successful, false otherwise
-     */
-    public boolean addPayment(Payment payment) {
-        return paymentService.addPayment(payment);
-    }
-
-    /**
-     * Updates a payment record in the database.
-     * Uses the payment_id from the provided Payment object to determine which record is to be updated.
-     * @param payment The Payment object containing the updated details
-     * @return true if the payment update was successful, false otherwise
-     */
-    public boolean updatePayment(Payment payment) {
-        return paymentService.updatePayment(payment);
-    }
-
-    /**
-     * Deletes a payment record from the database.
-     * This method deletes the payment record but does not modify the reservation.
-     * @param id The unique ID of the payment to delete
-     * @return true if the payment deletion was successful, false otherwise
-     */
-    public boolean deletePayment(int id) {
-        return paymentService.deletePayment(id);
     }
 
     /**

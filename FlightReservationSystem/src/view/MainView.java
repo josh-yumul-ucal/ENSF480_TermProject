@@ -27,7 +27,6 @@ public class MainView extends BorderPane {
     private FlightSearchPanel flightSearchPanel;
     private ReservationManagementPanel reservationManagementPanel;
     private FlightManagementPanel flightManagementPanel;
-    private PaymentPanel paymentPanel;
     private AircraftManagementPanel aircraftManagementPanel;
     private UserManagementPanel userManagementPanel;
     private PromotionPanel promotionPanel;
@@ -59,7 +58,6 @@ public class MainView extends BorderPane {
         flightSearchPanel = new FlightSearchPanel(controller);
         reservationManagementPanel = new ReservationManagementPanel(controller);
         flightManagementPanel = new FlightManagementPanel(controller);
-        paymentPanel = new PaymentPanel(controller);
         aircraftManagementPanel = new AircraftManagementPanel(controller);
         userManagementPanel = new UserManagementPanel(controller);
         promotionPanel = new PromotionPanel(controller);
@@ -85,7 +83,6 @@ public class MainView extends BorderPane {
         }
 
         // Note: Customer role should not have access to user management
-        tabPane.getTabs().add(new Tab("Payment", paymentPanel));
         tabPane.getTabs().add(new Tab("Promotion News", promotionPanel));
 
         // Disable close on all tabs
