@@ -109,6 +109,21 @@ public class FlightManagementPanel extends BasePane {
             }
         });
 
+        aircraftComboBox.setButtonCell(new ListCell<Aircraft>() {
+            @Override
+            protected void updateItem(Aircraft item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(aircraftComboBox.getPromptText());
+
+                    // Reset the total seats field
+                    totalSeatsField.setText("");
+                } else {
+                    setText(item.getAircraftName() + " (" + item.getModel() + ")");
+                }
+            }
+        });
+
         addButton = new Button("Add Flight");
         updateButton = new Button("Update Flight");
         deleteButton = new Button("Delete Flight");
@@ -262,7 +277,7 @@ public class FlightManagementPanel extends BasePane {
 
         // Add listener to the aircraft combo box to pre-populate the total seats field
         aircraftComboBox.valueProperty().addListener((obs, oldAircraft, newAircraft) -> {
-            if (newAircraft != null && totalSeatsField.getText().isEmpty()) {
+            if (newAircraft != null) {
                 totalSeatsField.setText(String.valueOf(newAircraft.getCapacity()));
             }
         });
@@ -272,8 +287,9 @@ public class FlightManagementPanel extends BasePane {
             if (newValue != null && !newValue.isEmpty()) {
                 try {
                     double value = Double.parseDouble(newValue);
-                    NumberFormat formatter = NumberFormat.getCurrencyInstance();
-                    String formatted = formatter.format(value);
+
+                    java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
+                    String formatted = df.format(value);
 
                     if (!formatted.equals(priceField.getText())) {
                         priceField.setText(formatted);
@@ -292,6 +308,10 @@ public class FlightManagementPanel extends BasePane {
     private void addFlight() {
         Flight flight = createFlightFromInput();
         if (flight != null) {
+            if (!validateArrivalTime(flight)) {
+                return;
+            }
+
             if (controller.addFlight(flight)) {
                 showAlert("Success", "Flight added successfully");
                 refreshFlights();
@@ -315,6 +335,10 @@ public class FlightManagementPanel extends BasePane {
 
         Flight flight = createFlightFromInput();
         if (flight != null) {
+            if (!validateArrivalTime(flight)) {
+                return;
+            }
+
             // Preserve the ID from the original selection
             flight.setFlightId(selected.getFlightId());
 
@@ -346,6 +370,25 @@ public class FlightManagementPanel extends BasePane {
                 showAlert("Error", "Failed to delete flight");
             }
         }
+    }
+
+    /**
+     * Validates that the arrival time is after the departure time.
+     * @param flight The flight to validate
+     * @return true If the validation passes, false otherwise
+     */
+    private boolean validateArrivalTime(Flight flight) {
+        Date departureTime = flight.getDepartureTime();
+        Date arrivalTime = flight.getArrivalTime();
+
+        if (departureTime != null && arrivalTime != null) {
+            if (arrivalTime.before(departureTime)) {
+                showAlert("Time Error", "Arrival time must be after departure time");
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -435,8 +478,8 @@ public class FlightManagementPanel extends BasePane {
         arrivalDateField.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm").format(flight.getArrivalTime()));
         totalSeatsField.setText(String.valueOf(flight.getTotalSeats()));
 
-        NumberFormat formatter = NumberFormat.getCurrencyInstance();
-        String formattedPrice = formatter.format(flight.getPrice());
+        java.text.DecimalFormat df = new java.text.DecimalFormat("0.00");
+        String formattedPrice = df.format(flight.getPrice());
         priceField.setText(formattedPrice);
 
         // Set aircraft in dropdown if exists

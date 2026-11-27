@@ -120,6 +120,10 @@ public class DatabaseManager {
                     total_amount REAL NOT NULL,
                     payment_method TEXT,
                     transaction_id TEXT,
+                    cardholder_name TEXT,
+                    credit_card_number TEXT,
+                    expiry_date TEXT,
+                    cvv TEXT,
                     FOREIGN KEY (customer_id) REFERENCES users (user_id),
                     FOREIGN KEY (flight_id) REFERENCES flights (flight_id)
                 )

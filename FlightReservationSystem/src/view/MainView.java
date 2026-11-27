@@ -77,9 +77,6 @@ public class MainView extends BorderPane {
             tabPane.getTabs().add(new Tab("Flight Management", flightManagementPanel));
             tabPane.getTabs().add(new Tab("Aircraft Management", aircraftManagementPanel));
             tabPane.getTabs().add(new Tab("User Management", userManagementPanel));
-        } else if (currentUser.getRole().equals("Flight Agent")) {
-            tabPane.getTabs().add(new Tab("Flight Management", flightManagementPanel));
-            tabPane.getTabs().add(new Tab("Aircraft Management", aircraftManagementPanel));
         }
 
         // Note: Customer role should not have access to user management

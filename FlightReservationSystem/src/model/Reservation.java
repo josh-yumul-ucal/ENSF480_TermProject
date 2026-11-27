@@ -27,6 +27,10 @@ public class Reservation {
     private final DoubleProperty totalAmount;
     private final StringProperty paymentMethod;
     private final StringProperty transactionId;
+    private final StringProperty cardholderName;
+    private final StringProperty creditCardNumber;
+    private final StringProperty expiryDate;
+    private final StringProperty cvv;
 
     /**
      * Default constructor for creating a new reservation object.
@@ -40,6 +44,10 @@ public class Reservation {
         this.totalAmount = new SimpleDoubleProperty();
         this.paymentMethod = new SimpleStringProperty();
         this.transactionId = new SimpleStringProperty();
+        this.cardholderName = new SimpleStringProperty();
+        this.creditCardNumber = new SimpleStringProperty();
+        this.expiryDate = new SimpleStringProperty();
+        this.cvv = new SimpleStringProperty();
     }
 
     /**
@@ -52,9 +60,14 @@ public class Reservation {
      * @param totalAmount The total cost of reservation
      * @param paymentMethod The payment method used
      * @param transactionId The transaction identifier
+     * @param cardholderName The name of the credit card holder
+     * @param creditCardNumber The credit card number
+     * @param expiryDate The expiry date from the credit card (YY/MM)
+     * @param cvv The credit card CVV number
      */
     public Reservation(int reservationId, int customerId, int flightId, Date bookingDate,
-                       int numberOfSeats, double totalAmount, String paymentMethod, String transactionId) {
+                       int numberOfSeats, double totalAmount, String paymentMethod, String transactionId,
+                       String cardholderName, String creditCardNumber, String expiryDate, String cvv) {
         this.reservationId = new SimpleIntegerProperty(reservationId);
         this.customerId = new SimpleIntegerProperty(customerId);
         this.flightId = new SimpleIntegerProperty(flightId);
@@ -63,6 +76,10 @@ public class Reservation {
         this.totalAmount = new SimpleDoubleProperty(totalAmount);
         this.paymentMethod = new SimpleStringProperty(paymentMethod);
         this.transactionId = new SimpleStringProperty(transactionId);
+        this.cardholderName = new SimpleStringProperty(cardholderName);
+        this.creditCardNumber = new SimpleStringProperty(creditCardNumber);
+        this.expiryDate = new SimpleStringProperty(expiryDate);
+        this.cvv = new SimpleStringProperty(cvv);
     }
 
     /**
@@ -208,4 +225,76 @@ public class Reservation {
      * @return The transaction ID property
      */
     public StringProperty transactionIdProperty() { return transactionId; }
+
+    /**
+     * Gets the credit card holder name for the reservation.
+     * @return The card holder name
+     */
+    public String getCardholderName() { return cardholderName.get(); }
+
+    /**
+     * Sets the card holder name for the reservation.
+     * @param cardholderName The new card holder name
+     */
+    public void setCardholderName(String cardholderName) { this.cardholderName.set(cardholderName); }
+
+    /**
+     * Gets the JavaFX property for card holder name.
+     * @return The card holder name property
+     */
+    public StringProperty cardholderNameProperty() { return cardholderName; }
+
+    /**
+     * Gets the credit card number for the reservation.
+     * @return The credit card number
+     */
+    public String getCreditCardNumber() { return creditCardNumber.get(); }
+
+    /**
+     * Sets the credit card number for the reservation.
+     * @param creditCardNumber The credit card number
+     */
+    public void setCreditCardNumber(String creditCardNumber) { this.creditCardNumber.set(creditCardNumber); }
+
+    /**
+     * Gets the JavaFX property for credit card number.
+     * @return The credit card number property
+     */
+    public StringProperty creditCardNumberProperty() { return creditCardNumber; }
+
+    /**
+     * Gets the expiry date for the credit card.
+     * @return The credit card expiry date (YY/MM)
+     */
+    public String getExpiryDate() { return expiryDate.get(); }
+
+    /**
+     * Sets the expiry date for the credit card.
+     * @param expiryDate The credit card expiry date (YY/MM)
+     */
+    public void setExpiryDate(String expiryDate) { this.expiryDate.set(expiryDate); }
+
+    /**
+     * Gets the JavaFX property for expiry date.
+     * @return The expiry date property
+     */
+    public StringProperty expiryDateProperty() { return expiryDate; }
+
+    /**
+     * Gets the credit card CVV number.
+     * @return The credit card CVV number
+     */
+    public String getCvv() { return cvv.get(); }
+
+    /**
+     * Sets the credit card CVV number.
+     * @param cvv The credit card CVV number
+     */
+    public void setCvv(String cvv) { this.cvv.set(cvv); }
+
+    /**
+     * Gets the JavaFX property for CVV.
+     * @return The CVV property
+     */
+    public StringProperty cvvProperty() { return cvv; }
 }
