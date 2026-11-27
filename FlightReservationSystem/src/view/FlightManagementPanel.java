@@ -44,6 +44,7 @@ public class FlightManagementPanel extends BasePane {
     private Button addButton;
     private Button updateButton;
     private Button deleteButton;
+    private Button clearButton;
     private Button refreshButton;
     private TableView<Flight> flightTable;
     private ObservableList<Flight> flightData;
@@ -127,6 +128,7 @@ public class FlightManagementPanel extends BasePane {
         addButton = new Button("Add Flight");
         updateButton = new Button("Update Flight");
         deleteButton = new Button("Delete Flight");
+        clearButton = new Button("Clear");
         refreshButton = new Button("Refresh");
 
         flightData = FXCollections.observableArrayList();
@@ -243,7 +245,7 @@ public class FlightManagementPanel extends BasePane {
         inputPanel.add(aircraftComboBox, 1, 8);
 
         HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton);
+        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, clearButton, refreshButton);
 
         VBox inputBox = new VBox(10);
         inputBox.getChildren().addAll(inputPanel, buttonBox);
@@ -267,6 +269,7 @@ public class FlightManagementPanel extends BasePane {
         addButton.setOnAction(e -> addFlight());
         updateButton.setOnAction(e -> updateFlight());
         deleteButton.setOnAction(e -> deleteFlight());
+        clearButton.setOnAction(e -> clearInputFields());
         refreshButton.setOnAction(e -> refreshFlights());
 
         flightTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {

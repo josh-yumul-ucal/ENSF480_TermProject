@@ -33,6 +33,7 @@ public class AircraftManagementPanel extends BasePane {
     private Button addButton;
     private Button updateButton;
     private Button deleteButton;
+    private Button clearButton;
     private Button refreshButton;
     private TableView<Aircraft> aircraftTable;
     private ObservableList<Aircraft> aircraftData;
@@ -67,6 +68,7 @@ public class AircraftManagementPanel extends BasePane {
         addButton = new Button("Add Aircraft");
         updateButton = new Button("Update Aircraft");
         deleteButton = new Button("Delete Aircraft");
+        clearButton = new Button("Clear");
         refreshButton = new Button("Refresh");
 
         aircraftData = FXCollections.observableArrayList();
@@ -110,7 +112,7 @@ public class AircraftManagementPanel extends BasePane {
         inputPanel.add(capacityField, 1, 2);
 
         HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton);
+        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, clearButton, refreshButton);
 
         VBox inputBox = new VBox(10);
         inputBox.getChildren().addAll(inputPanel, buttonBox);
@@ -134,6 +136,7 @@ public class AircraftManagementPanel extends BasePane {
         addButton.setOnAction(e -> addAircraft());
         updateButton.setOnAction(e -> updateAircraft());
         deleteButton.setOnAction(e -> deleteAircraft());
+        clearButton.setOnAction((e -> clearInputFields()));
         refreshButton.setOnAction(e -> refreshAircraft());
 
         aircraftTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {

@@ -37,6 +37,7 @@ public class UserManagementPanel extends BasePane {
     private Button addButton;
     private Button updateButton;
     private Button deleteButton;
+    private Button clearButton;
     private Button refreshButton;
     private TableView<User> userTable;
     private ObservableList<User> userData;
@@ -87,6 +88,7 @@ public class UserManagementPanel extends BasePane {
         addButton = new Button("Add User");
         updateButton = new Button("Update User");
         deleteButton = new Button("Delete User");
+        clearButton = new Button("Clear");
         refreshButton = new Button("Refresh");
 
         userData = FXCollections.observableArrayList();
@@ -146,7 +148,7 @@ public class UserManagementPanel extends BasePane {
         inputPanel.add(emailField, 1, 5);
 
         HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton);
+        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, clearButton, refreshButton);
 
         VBox inputBox = new VBox(10);
         inputBox.getChildren().addAll(inputPanel, buttonBox);
@@ -170,6 +172,7 @@ public class UserManagementPanel extends BasePane {
         addButton.setOnAction(e -> addUser());
         updateButton.setOnAction(e -> updateUser());
         deleteButton.setOnAction(e -> deleteUser());
+        clearButton.setOnAction(e -> clearInputFields());
         refreshButton.setOnAction(e -> refreshUsers());
 
         userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {

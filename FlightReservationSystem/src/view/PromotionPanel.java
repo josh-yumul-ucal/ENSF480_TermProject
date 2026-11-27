@@ -37,6 +37,7 @@ public class PromotionPanel extends BasePane {
     private Button addButton;
     private Button updateButton;
     private Button deleteButton;
+    private Button clearButton;
     private Button refreshButton;
     private TableView<Promotion> promotionTable;
     private ObservableList<Promotion> promotionData;
@@ -70,6 +71,7 @@ public class PromotionPanel extends BasePane {
         addButton = new Button("Add Promotion");
         updateButton = new Button("Update Promotion");
         deleteButton = new Button("Delete Promotion");
+        clearButton = new Button("Clear");
         refreshButton = new Button("Refresh");
 
         promotionData = FXCollections.observableArrayList();
@@ -115,7 +117,7 @@ public class PromotionPanel extends BasePane {
         inputPanel.add(textArea, 1, 1);
 
         HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton);
+        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, clearButton, refreshButton);
 
         VBox inputBox = new VBox(10);
         inputBox.getChildren().addAll(inputPanel, buttonBox);
@@ -139,6 +141,7 @@ public class PromotionPanel extends BasePane {
         addButton.setOnAction(e -> addPromotion());
         updateButton.setOnAction(e -> updatePromotion());
         deleteButton.setOnAction(e -> deletePromotion());
+        clearButton.setOnAction(e -> clearInputFields());
         refreshButton.setOnAction(e -> refreshPromotions());
 
         promotionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {

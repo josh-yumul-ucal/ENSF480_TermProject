@@ -69,16 +69,35 @@ public class LoginPanel extends BasePane {
         setSpacing(15);
         setAlignment(javafx.geometry.Pos.CENTER);
 
-        VBox formBox = new VBox(10);
-        formBox.getChildren().addAll(
-                new Label("ENSF480 Group 1 Flight Reservation System - Login"),
-                usernameField,
-                passwordField,
-                loginButton,
-                cancelButton
-        );
+        // Create grid pane for the form elements
+        GridPane grid = new GridPane();
+        grid.setPadding(new Insets(10));
+        grid.setHgap(10);
+        grid.setVgap(10);
 
-        getChildren().add(formBox);
+        // Add the title
+        Label titleLabel = new Label("ENSF480 Group 1 Flight Reservation System - Login");
+        titleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        GridPane.setColumnSpan(titleLabel, 4);
+        grid.add(titleLabel, 0, 0);
+
+        // Username row
+        Label usernameLabel = new Label("Username:");
+        grid.add(usernameLabel, 0, 1);
+        grid.add(usernameField, 1, 1);
+        GridPane.setColumnSpan(usernameField, 2);
+
+        // Add the password row
+        Label passwordLabel = new Label("Password:");
+        grid.add(passwordLabel, 0, 2);
+        grid.add(passwordField, 1, 2);
+        GridPane.setColumnSpan(passwordField, 2);
+
+        // Add the button row
+        grid.add(loginButton, 1,3);
+        grid.add(cancelButton, 3, 3);
+
+        getChildren().add(grid);
     }
 
     /**
@@ -121,7 +140,7 @@ public class LoginPanel extends BasePane {
      */
     public void show() {
         primaryStage.setTitle("ENSF480 Group 1 Flight Reservation System - Login");
-        primaryStage.setScene(new javafx.scene.Scene(this, 420, 250));
+        primaryStage.setScene(new javafx.scene.Scene(this, 440, 250));
         primaryStage.show();
     }
 }

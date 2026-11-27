@@ -54,6 +54,7 @@ public class ReservationManagementPanel extends BasePane {
     private Button addButton;
     private Button updateButton;
     private Button deleteButton;
+    private Button clearButton;
     private Button refreshButton;
     private Button generateConfirmationButton;
     private TableView<Reservation> reservationTable;
@@ -174,6 +175,7 @@ public class ReservationManagementPanel extends BasePane {
         addButton = new Button("Add Reservation");
         updateButton = new Button("Update Reservation");
         deleteButton = new Button("Delete Reservation");
+        clearButton = new Button("Clear");
         refreshButton = new Button("Refresh");
         generateConfirmationButton = new Button("Generate Confirmation");
 
@@ -301,7 +303,7 @@ public class ReservationManagementPanel extends BasePane {
         inputPanel.add(cvvField, 3, 4);
 
         HBox buttonBox = new HBox(10);
-        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, refreshButton, generateConfirmationButton);
+        buttonBox.getChildren().addAll(addButton, updateButton, deleteButton, clearButton, refreshButton, generateConfirmationButton);
 
         VBox inputBox = new VBox(10);
         inputBox.getChildren().addAll(inputPanel, buttonBox);
@@ -325,6 +327,7 @@ public class ReservationManagementPanel extends BasePane {
         addButton.setOnAction(e -> addReservation());
         updateButton.setOnAction(e -> updateReservation());
         deleteButton.setOnAction(e -> deleteReservation());
+        clearButton.setOnAction(e -> clearInputFields());
         refreshButton.setOnAction(e -> refreshReservations());
         generateConfirmationButton.setOnAction(e -> generateConfirmation());
 
